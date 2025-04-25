@@ -207,16 +207,28 @@ export default function JoyfulMindsPage() {
             <span className="font-bold text-indigo-600 dark:text-indigo-400 text-xl">Joyful Minds</span>
           </div>
           <div className="hidden md:flex space-x-6">
-            {['HOME', 'ABOUT US', 'OUR INITIATIVES', 'LOG IN', 'REPORT', 'CONTACT US'].map((item) => (
-              <a 
-                key={item} 
-                href="#" 
-                className="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200 font-medium text-sm"
-              >
-                {item}
-              </a>
-            ))}
-          </div>
+  {['HOME', 'ABOUT US', 'OUR INITIATIVES', 'LOG IN', 'PERKS', 'CONTACT US'].map((item) => {
+    const href =
+      item === 'PERKS' ? '#perks' :
+      item === 'HOME' ? '/' :
+      item === 'ABOUT US' ? '#about' :
+      item === 'OUR INITIATIVES' ? '#initiatives' :
+      item === 'LOG IN' ? '#login' :
+      item === 'CONTACT US' ? '#contact' :
+      '#';
+
+    return (
+      <a 
+        key={item}
+        href={href}
+        className="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200 font-medium text-sm"
+      >
+        {item}
+      </a>
+    );
+  })}
+</div>
+
 
 
           {/* Currency */}
@@ -448,7 +460,7 @@ export default function JoyfulMindsPage() {
 
 
                 {/* Perk */}
-                <div className={`min-h-screen rounded-lg ${darkMode ? 'bg-gray-900 text-white' : 'text-gray-800'}`}>
+                <div id="perks" className={`min-h-screen rounded-lg ${darkMode ? 'bg-gray-900 text-white' : 'text-gray-800'}`}>
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold flex items-center">
@@ -481,17 +493,17 @@ export default function JoyfulMindsPage() {
           </div>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div  className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 ">
           {filteredPerks.map((perk) => (
             <div 
               key={perk.id} 
-              className={`p-6 rounded-lg flex items-center ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm`}
+              className={`p-5 rounded-lg flex items-center ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm`}
             >
-              <div className="flex-shrink-0 mr-4">
+              <div className="flex-shrink-0 mr-7">
                 <img 
                   src={perk.image} 
                   alt={perk.name} 
-                  className="w-16 h-16 object-cover rounded"
+                  className="w-21 h-21 object-cover rounded "
                   width={64}
                   height={64}
                 />
@@ -513,7 +525,7 @@ export default function JoyfulMindsPage() {
                   >
                     <MinusCircle size={20} />
                   </button>
-                  <span className="mx-3 w-6 text-center">{cart[perk.id] || 0}</span>
+                  <span className="mx-2 w-2 text-center">{cart[perk.id] || 0}</span>
                   <button 
                     onClick={() => updateCart(perk.id, 1)} 
                     className={`p-1 rounded-full ${darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-800'}`}
@@ -527,11 +539,11 @@ export default function JoyfulMindsPage() {
           ))}
         </div>
         
-        <div className={`p-6 rounded-lg ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm`}>
-          <div className="flex justify-between items-center">
+        <div className={`p-6 rounded-lg  ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm`}>
+          <div className="flex justify-between items-centerleading-relaxed ">
             <div>
-              <p className="text-sm font-medium">Subtotal ({Object.keys(cart).length} items):</p>
-              <p className="text-2xl font-bold">{formatPrice(subtotal)}</p>
+              <p className="text-sm font-medium leading-relaxed">Subtotal ({Object.keys(cart).length} items):</p>
+              <p className="text-2xl font-bold leading-relaxed">{formatPrice(subtotal)}</p>
             </div>
             <button 
               className={`px-6 py-3 rounded-full flex items-center ${
@@ -551,8 +563,8 @@ export default function JoyfulMindsPage() {
     </div>
          {/* Updates */}
                 <div className="container mx-auto px-4 py-8 max-w-5xl">
-  <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm p-6">
-    <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+  <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm p-6 ">
+    <h2 className="text-2xl font-bold text-gray-800 dark:text-white leading-relaxed">
       Updates ({updates.length})
     </h2>
 
