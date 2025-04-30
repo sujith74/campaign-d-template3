@@ -184,6 +184,21 @@ export default function JoyfulMindsPage() {
     }
   ];
 
+  const palettes = {
+    primary: {
+      light: "#4C9F38",
+      main: "#4C9F38",
+      dark: "#4C9F38",
+      contrastText: "#fff"
+    },
+    secondary: {
+      light: "#eecd5e",
+      main: "#E9BD29",
+      dark: "#d5a916",
+      contrastText: "#000"
+    }
+  };
+
   // Animation values
   const headerOpacity = useTransform(scrollY, [0, 100], [1, 0.9]);
   const headerScale = useTransform(scrollY, [0, 100], [1, 0.98]);
@@ -335,9 +350,22 @@ export default function JoyfulMindsPage() {
             >
               {darkMode ? '☀️' : '🌙'}
             </button>
-            <button className="hidden md:block bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition-all duration-200 hover:shadow-md">
-              DONATE NOW
-            </button>
+            <button
+  style={{
+    background: palettes.secondary.main,
+    color: palettes.secondary.contrastText,
+  }}
+  onMouseEnter={e => {
+    e.currentTarget.style.background = ` ${palettes.secondary.dark}`;
+  }}
+  onMouseLeave={e => {
+    e.currentTarget.style.background = `${palettes.secondary.main}`;
+  }}
+  className="hidden md:block font-semibold py-2 px-4 rounded-lg shadow-sm transition-all duration-200 hover:shadow-md"
+>
+  DONATE NOW
+</button>
+
             <button className="md:hidden text-gray-500 dark:text-gray-400">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -359,9 +387,16 @@ export default function JoyfulMindsPage() {
             transition={{ delay: 0.2 }}
             className="flex items-center justify-center text-sm text-indigo-800 dark:text-indigo-200 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm py-2 px-4 rounded-full inline-flex mx-auto border border-indigo-100 dark:border-indigo-800 shadow-sm"
           >
-            <span className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-white px-3 py-1 rounded-full text-xs font-semibold mr-2 shadow-sm">
-              THIS CAMPAIGN SUPPORTS A FUNDRAISING INITIATIVE BY DIGITAL MINDS
-            </span>
+            <span
+  style={{
+    backgroundColor: palettes.secondary.dark,
+    color: palettes.secondary.contrastText,
+  }}
+  className="px-3 py-1 rounded-full text-xs font-semibold mr-2 shadow-sm"
+>
+  THIS CAMPAIGN SUPPORTS A FUNDRAISING INITIATIVE BY DIGITAL MINDS
+</span>
+
           </motion.div>
         </div>
       </motion.div>
@@ -545,18 +580,39 @@ export default function JoyfulMindsPage() {
               <p className="text-sm font-medium leading-relaxed">Subtotal ({Object.keys(cart).length} items):</p>
               <p className="text-2xl font-bold leading-relaxed">{formatPrice(subtotal)}</p>
             </div>
-            <button 
-              className={`px-6 py-3 rounded-full flex items-center ${
-                Object.keys(cart).length > 0 
-                  ? 'bg-yellow-500 hover:bg-yellow-600 text-white' 
-                  : `${darkMode ? 'bg-gray-700 text-gray-500' : 'bg-gray-200 text-gray-400'} cursor-not-allowed`
-              } transition duration-200`}
-              disabled={Object.keys(cart).length === 0}
-              aria-label="Donate now"
-            >
-              <Heart size={20} className="mr-2" />
-              DONATE NOW
-            </button>
+            <button
+  className={`px-6 py-3 rounded-full flex items-center transition duration-200 ${
+    Object.keys(cart).length > 0
+      ? ''
+      : `${darkMode ? 'bg-gray-700 text-gray-500' : 'bg-gray-200 text-gray-400'} cursor-not-allowed`
+  }`}
+  style={
+    Object.keys(cart).length > 0
+      ? {
+          backgroundColor: palettes.secondary.main,
+          color: palettes.secondary.contrastText,
+        }
+      : {}
+  }
+  onMouseEnter={(e) => {
+    if (Object.keys(cart).length > 0) {
+      e.currentTarget.style.backgroundColor = palettes.secondary.dark;
+    }
+  }}
+  onMouseLeave={(e) => {
+    if (Object.keys(cart).length > 0) {
+      e.currentTarget.style.backgroundColor = palettes.secondary.main;
+    }
+  }}
+  disabled={Object.keys(cart).length === 0}
+  aria-label="Donate now"
+>
+  <Heart size={20} className="mr-2" />
+  DONATE NOW
+</button>
+
+
+
           </div>
         </div>
       </div>
@@ -764,17 +820,59 @@ export default function JoyfulMindsPage() {
               </div>
               
               {/* Buttons */}
-              <button className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition-all duration-200 hover:shadow-lg mb-4 flex justify-center items-center">
-                <Heart className="h-5 w-5 mr-2" /> DONATE NOW
-              </button>
+              <button
+  style={{
+    background: palettes.secondary.main,
+    color: palettes.secondary.contrastText,
+    border: `1px solid ${palettes.secondary.light}`,
+  }}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.background = palettes.secondary.dark;
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.background = palettes.secondary.main;
+  }}
+  className="w-full hover:from-[${palettes.secondary.main}] hover:to-[${palettes.secondary.dark}] 
+    font-semibold py-3 px-4 rounded-lg shadow-md transition-all duration-200 hover:shadow-lg mb-4 flex justify-center items-center"
+>
+  <Heart className="h-5 w-5 mr-2" /> DONATE NOW
+</button>
+
+
               
               <div className="grid grid-cols-2 gap-4">
-                <button className="bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-700 dark:to-gray-800 hover:from-gray-200 hover:to-gray-100 dark:hover:from-gray-600 dark:hover:to-gray-700 text-gray-700 dark:text-gray-300 font-semibold py-3 px-4 rounded-lg shadow-sm transition-all duration-200 hover:shadow-md flex justify-center items-center border border-gray-200 dark:border-gray-700">
-                  <Share className="h-5 w-5 mr-2" /> SHARE
-                </button>
-                <button className="bg-gradient-to-r from-indigo-100 to-indigo-50 dark:from-indigo-900/50 dark:to-indigo-800/50 hover:from-indigo-200 hover:to-indigo-100 dark:hover:from-indigo-800 dark:hover:to-indigo-700 text-indigo-700 dark:text-indigo-300 font-semibold py-3 px-4 rounded-lg shadow-sm transition-all duration-200 hover:shadow-md flex justify-center items-center border border-indigo-200 dark:border-indigo-700">
-                  <Users className="h-5 w-5 mr-2" /> JOIN TEAM
-                </button>
+              <button
+  style={{
+    background: `linear-gradient(to right, ${palettes.primary.light}, ${palettes.primary.main})`,
+    color: palettes.primary.contrastText,
+    border: `1px solid ${palettes.primary.light}`,
+  }}
+  className="dark:bg-gradient-to-r dark:from-[${palettes.primary.dark}] dark:to-[${palettes.primary.main}] 
+    hover:from-[${palettes.primary.main}] hover:to-[${palettes.primary.dark}] 
+    dark:hover:from-[${palettes.primary.dark}] dark:hover:to-[${palettes.primary.light}] 
+    font-semibold py-3 px-4 rounded-lg shadow-sm transition-all duration-200 hover:shadow-md flex justify-center items-center"
+>
+  <Share className="h-5 w-5 mr-2" /> SHARE
+</button>
+
+
+<button
+  style={{
+    backgroundColor: palettes.secondary.main,
+    color: palettes.secondary.contrastText,
+    border: `1px solid ${palettes.secondary.main}`,
+  }}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.background = palettes.secondary.dark;
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.background = palettes.secondary.main;
+  }}
+  className="font-semibold py-3 px-4 rounded-lg shadow-sm transition-all duration-200 hover:shadow-md flex justify-center items-center"
+>
+  <Users className="h-5 w-5 mr-2" /> JOIN TEAM
+</button>
+
               </div>
             </motion.div>
             
