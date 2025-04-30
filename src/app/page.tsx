@@ -210,7 +210,7 @@ export default function JoyfulMindsPage() {
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.3 }}
-        className="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50 border-b border-gray-100 dark:border-gray-700"
+        className="bg-white dark:bg-gray-800 shadow-sm sticky top-0  z-50 border-b border-gray-100 dark:border-gray-700"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
           <div className="flex items-center">
@@ -497,36 +497,28 @@ export default function JoyfulMindsPage() {
                 {/* Perk */}
                 <div id="perks" className={`min-h-screen rounded-lg ${darkMode ? 'bg-gray-900 text-white' : 'text-gray-800'}`}>
       <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold flex items-center">
-            Choose a perk <span className="ml-2 text-yellow-400">✨</span>
-          </h1>
-          {/* <button 
-            onClick={toggleDarkMode} 
-            className={`p-2 rounded-full ${darkMode ? 'bg-gray-700' : 'bg-gray-200'}`}
-            aria-label="Toggle dark mode"
-          >
-            {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-          </button> */}
-        </div>
-        
-        <div className="mb-8">
-          <div className={`relative w-full border rounded-lg ${darkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-300 bg-white'}`}>
-            <select 
-              className={`appearance-none w-full px-4 py-3 rounded-lg focus:outline-none ${darkMode ? 'bg-gray-800' : 'bg-white'}`}
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              aria-label="Select perk category"
-            >
-              {categories.map((category) => (
-                <option key={category} value={category}>{category}</option>
-              ))}
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4">
-              <ChevronDown size={20} className={darkMode ? 'text-gray-400' : 'text-gray-500'} />
-            </div>
-          </div>
-        </div>
+      <div className="flex justify-between items-center mb-6">
+  <h1 className="text-2xl font-bold flex items-center">
+    Choose a perk <span className="ml-2 text-yellow-400">✨</span>
+  </h1>
+
+  <div className={`relative w-60 border rounded-lg ${darkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-300 bg-white'}`}>
+    <select 
+      className={`appearance-none w-full px-4 py-2 rounded-lg focus:outline-none ${darkMode ? 'bg-gray-800' : 'bg-white'}`}
+      value={selectedCategory}
+      onChange={(e) => setSelectedCategory(e.target.value)}
+      aria-label="Select perk category"
+    >
+      {categories.map((category) => (
+        <option key={category} value={category}>{category}</option>
+      ))}
+    </select>
+    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3">
+      <ChevronDown size={20} className={darkMode ? 'text-gray-400' : 'text-gray-500'} />
+    </div>
+  </div>
+</div>
+
         
         <div  className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 ">
           {filteredPerks.map((perk) => (
@@ -535,86 +527,102 @@ export default function JoyfulMindsPage() {
               className={`p-5 rounded-lg flex items-center ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm`}
             >
               <div className="flex-shrink-0 mr-7">
+                <div className ="flex flex-col">
                 <img 
                   src={perk.image} 
                   alt={perk.name} 
-                  className="w-21 h-21 object-cover rounded "
+                  className="w-25 h-25 object-cover rounded mb-3 "
                   width={64}
                   height={64}
                 />
-              </div>
-              <div className="flex-grow">
-                <h3 className="font-bold">{perk.name}</h3>
-                <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'} mb-1`}>{perk.description}</p>
-                <p className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                  Only {perk.stock} remaining.
-                </p>
-              </div>
-              <div className="flex-shrink-0 ml-4">
-                <div className="text-lg font-bold mb-2">{formatPrice(perk.price)}</div>
-                <div className="flex items-center">
-                  <button 
-                    onClick={() => updateCart(perk.id, -1)} 
-                    className={`p-1 rounded-full ${darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-800'}`}
-                    aria-label="Decrease quantity"
-                  >
-                    <MinusCircle size={20} />
-                  </button>
-                  <span className="mx-2 w-2 text-center">{cart[perk.id] || 0}</span>
-                  <button 
-                    onClick={() => updateCart(perk.id, 1)} 
-                    className={`p-1 rounded-full ${darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-800'}`}
-                    aria-label="Increase quantity"
-                  >
-                    <PlusCircle size={20} />
-                  </button>
+                <div className=" font-bold text-sm text-center ">{formatPrice(perk.price)}</div>
+
                 </div>
               </div>
+              <div className="flex flex-col">
+  <div className="flex-grow mb-1">
+    <h3 className="font-bold">{perk.name}</h3>
+    <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'} mb-1`}>
+      {perk.description}
+    </p>
+
+    {/* Make this section flex to align text and counter in a row */}
+    <div className="flex justify-between items-center">
+      <p className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+        Only {perk.stock} remaining.
+      </p>
+
+      {/* Counter aligned to the right */}
+      <div className="flex items-center">
+        <button 
+          onClick={() => updateCart(perk.id, -1)} 
+          className={`p-1 rounded-full ${darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-800'}`}
+          aria-label="Decrease quantity"
+        >
+          <MinusCircle size={12} />
+        </button>
+        <span className="mx-2 w-2 text-xs text-center text-gray-500">{cart[perk.id] || 0}</span>
+        <button 
+          onClick={() => updateCart(perk.id, 1)} 
+          className={`p-1 rounded-full ${darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-800'}`}
+          aria-label="Increase quantity"
+        >
+          <PlusCircle size={12} />
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
             </div>
           ))}
+          <div className={`p-5 rounded-lg w-94 h-43  items-center justify-between ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm`}>
+  <div className='text-center mb-4'>
+    <p className="text-sm font-medium leading-relaxed ">
+      Subtotal ({Object.keys(cart).length} items):
+    </p>
+    <p className="text-2xl font-bold leading-relaxed">
+      {formatPrice(subtotal)}
+    </p>
+  </div>
+
+  <button
+    className={`px-6 py-3 rounded-lg   flex justify-center items-center text-center w-80 transition duration-200 ${
+      Object.keys(cart).length > 0
+        ? ''
+        : `${darkMode ? 'bg-gray-700 text-gray-500' : 'bg-gray-200 text-gray-400'} cursor-not-allowed`
+    }`}
+    style={
+      Object.keys(cart).length > 0
+        ? {
+            backgroundColor: palettes.secondary.main,
+            color: palettes.secondary.contrastText,
+          }
+        : {}
+    }
+    onMouseEnter={(e) => {
+      if (Object.keys(cart).length > 0) {
+        e.currentTarget.style.backgroundColor = palettes.secondary.dark;
+      }
+    }}
+    onMouseLeave={(e) => {
+      if (Object.keys(cart).length > 0) {
+        e.currentTarget.style.backgroundColor = palettes.secondary.main;
+      }
+    }}
+    disabled={Object.keys(cart).length === 0}
+    aria-label="Donate now"
+  >
+    <Heart size={20} className="mr-2" />
+    DONATE NOW
+  </button>
+</div>
+
         </div>
         
-        <div className={`p-6 rounded-lg  ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm`}>
-          <div className="flex justify-between items-centerleading-relaxed ">
-            <div>
-              <p className="text-sm font-medium leading-relaxed">Subtotal ({Object.keys(cart).length} items):</p>
-              <p className="text-2xl font-bold leading-relaxed">{formatPrice(subtotal)}</p>
-            </div>
-            <button
-  className={`px-6 py-3 rounded-full flex items-center transition duration-200 ${
-    Object.keys(cart).length > 0
-      ? ''
-      : `${darkMode ? 'bg-gray-700 text-gray-500' : 'bg-gray-200 text-gray-400'} cursor-not-allowed`
-  }`}
-  style={
-    Object.keys(cart).length > 0
-      ? {
-          backgroundColor: palettes.secondary.main,
-          color: palettes.secondary.contrastText,
-        }
-      : {}
-  }
-  onMouseEnter={(e) => {
-    if (Object.keys(cart).length > 0) {
-      e.currentTarget.style.backgroundColor = palettes.secondary.dark;
-    }
-  }}
-  onMouseLeave={(e) => {
-    if (Object.keys(cart).length > 0) {
-      e.currentTarget.style.backgroundColor = palettes.secondary.main;
-    }
-  }}
-  disabled={Object.keys(cart).length === 0}
-  aria-label="Donate now"
->
-  <Heart size={20} className="mr-2" />
-  DONATE NOW
-</button>
 
 
-
-          </div>
-        </div>
+        
       </div>
     </div>
          {/* Updates */}
@@ -781,7 +789,7 @@ export default function JoyfulMindsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.5 }}
-              className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 sticky top-24"
+              className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 sticky absolute inset-x-0 top-0 z-[9999]"
             >
               <div className="flex justify-between items-start mb-4">
                 <div>
