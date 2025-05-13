@@ -491,7 +491,7 @@ export default function CampaignSection() {
                 >
                   <Minus size={16} />
                 </IconButton>
-                <span className="mx-1 w-8 text-center">{cart[perk.id] || 0}</span>
+                <span className="mx-1 w-8 text-center">{cart[perk.id]?.quantity || 0}</span>
                 <IconButton
                   onClick={() => updateCart(perk.id, 1)} 
                   className={`p-1 rounded-full text-gray-500 hover:text-gray-800 border border-gray-300`}
@@ -534,9 +534,10 @@ export default function CampaignSection() {
               <div key={perk.id} className="flex justify-between items-center">
                 <div>
                   <span className="font-medium text-gray-900 dark:text-white">{perk.name}</span>
-                  <span className="text-gray-500 dark:text-gray-400 text-sm ml-2">x{cart[perk.id]}</span>
-                </div>
-                <span className="font-medium">₹{parseInt(perk.price.replace(/,/g, '')) * cart[perk.id]}</span>
+                  <span className="text-gray-500 dark:text-gray-400 text-sm ml-2">x{cart[perk.id]?.quantity || 0}</span>
+</div>
+<span className="font-medium">₹{parseInt(perk.price.replace(/,/g, '')) * (cart[perk.id]?.quantity || 0)}</span>
+
               </div>
             ))}
         </div>
