@@ -5,12 +5,11 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { 
   Button, 
   IconButton, 
-  useTheme 
+  // useTheme 
 } from '@mui/material';
 import { 
   Heart, 
   Share, 
-  Users, 
   ChevronDown, 
   Plus, 
   Minus 
@@ -25,7 +24,7 @@ const fadeIn = {
 };
 
 export default function CampaignSection() {
-  const [darkMode, setDarkMode] = useState(false);
+  // const [darkMode, setDarkMode] = useState(false);
   const [selectedAmount, setSelectedAmount] = useState('₹1,000');
   const [donationType, setDonationType] = useState('one-time');
   const [selectedCategory, setSelectedCategory] = useState('All Perks');
@@ -40,7 +39,7 @@ export default function CampaignSection() {
   const daysRemaining = 18;
 
   // Theme
-  const theme = useTheme();
+  // const theme = useTheme();
   const palettes = {
     primary: {
       main: '#F97316', // Orange primary color from image
@@ -320,7 +319,7 @@ export default function CampaignSection() {
                 <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Our Mission</h2>
                 
                 <p className="text-gray-700 dark:text-gray-300 text-lg leading-relaxed">
-                  At <span className="font-semibold text-orange-600">Summer Sparks</span>, we're dedicated to protecting animals in need across India. 
+                  At <span className="font-semibold text-orange-600">Summer Sparks</span>, we&apos;re dedicated to protecting animals in need across India. 
                   Our comprehensive program provides shelter, medical care, and rehabilitation for abandoned and injured animals, 
                   while also working to educate communities about animal welfare.
                 </p>
