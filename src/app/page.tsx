@@ -96,14 +96,16 @@ export default function CampaignSection() {
 
   // Update cart  
   const updateCart = (id: string, change: number): void => {
-    const currentAmount = cart[id] || 0;
+    const currentItem = cart[id];
+    const currentAmount = currentItem ? currentItem.quantity : 0;
     const newAmount = Math.max(0, currentAmount + change);
-
-    setCart((prev) => ({
+  
+    setCart(prev => ({
       ...prev,
-      [id]: newAmount || 0, // Ensure no negative values
+      [id]: { ...currentItem, quantity: newAmount } // Update the quantity of the specific item
     }));
   };
+  
 
 
   // Calculate subtotal
