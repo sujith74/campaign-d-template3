@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { 
   Button, 
   IconButton, 
-  useTheme ,
+
   Card, CardContent, Typography, Avatar, 
 } from '@mui/material';
 import { 
@@ -31,6 +31,11 @@ export default function CampaignSection() {
   // const [darkMode, setDarkMode] = useState(false);
   // const [selectedAmount, setSelectedAmount] = useState('₹1,000');
   // const [donationType, setDonationType] = useState('one-time');
+
+  type CartItem = {
+    quantity: number; // Adjust according to your cart item's properties
+  };
+  
   const [selectedCategory, setSelectedCategory] = useState('All Perks');
   const [expanded, setExpanded] = useState<string | null>(null);
     const [cart, setCart] = useState<Record<string, any>>({});
@@ -85,9 +90,9 @@ export default function CampaignSection() {
     setCurrent((prev) => (prev - 1 + images.length) % images.length);
   };
   // Format currency
-  const formatCurrency = (amount: number) => {
-    return `₹${amount.toLocaleString()}`;
-  };
+  // const formatCurrency = (amount: number) => {
+  //   return `₹${amount.toLocaleString()}`;
+  // };
 
   // Update cart  
   const updateCart = (id: string, change: number): void => {
@@ -325,7 +330,7 @@ export default function CampaignSection() {
                 <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Our Mission</h2>
                 
                 <p className="text-gray-700 dark:text-gray-300 text-lg leading-relaxed">
-                  At <span className="font-semibold text-blue-600">Summer Sparks</span>, we're dedicated to protecting animals in need across India. 
+                  At <span className="font-semibold text-blue-600">Summer Sparks</span>, we&apos;re dedicated to protecting animals in need across India. 
                   Our comprehensive program provides shelter, medical care, and rehabilitation for abandoned and injured animals, 
                   while also working to educate communities about animal welfare.
                 </p>
