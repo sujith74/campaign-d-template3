@@ -1,36 +1,30 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState} from 'react';
+import { motion } from 'framer-motion';
 import { 
   Button, 
-  Card, 
-  CardContent, 
-  TextField, 
-  Box, 
+
   Typography, 
-  Divider, 
+
   IconButton,
-  Avatar,
-  Chip,
-  LinearProgress,
+ 
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  ToggleButtonGroup,
-  ToggleButton
+ 
 } from '@mui/material';
 import { 
   ChevronDown, 
-  ChevronUp,
+
   Heart, 
   Share, 
   Users, 
-  Mail, 
+
   Plus, 
   Minus,
   Clock,
-  Check
+  
 } from 'lucide-react';
 
 // Define theme palettes
@@ -56,7 +50,7 @@ type Cart = Record<number, number>;
 
   // const [darkMode, setDarkMode] = useState(false);
   const [selectedAmount, setSelectedAmount] = useState('₹500');
-  const [customAmount, setCustomAmount] = useState('');
+  // const [customAmount, setCustomAmount] = useState('');
   const [donationType, setDonationType] = useState('one-time');
   // const [cart, setCart] = useState({});
   const [selectedCategory, setSelectedCategory] = useState('All Perks');
