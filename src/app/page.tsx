@@ -31,8 +31,8 @@ import {
 const palettes = {
   primary: {
     light: '#f5d0fe',
-    main: '#d8b4fe',
-    dark: '#c084fc',
+    main: '#c084fc',
+    dark: '#a855f7',
     contrastText: '#fff'
   },
   secondary: {
