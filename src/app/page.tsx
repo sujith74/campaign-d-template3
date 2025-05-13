@@ -35,10 +35,10 @@ export default function CampaignSection() {
   type CartItem = {
     quantity: number; // Adjust according to your cart item's properties
   };
-  
+
   const [selectedCategory, setSelectedCategory] = useState('All Perks');
   const [expanded, setExpanded] = useState<string | null>(null);
-    const [cart, setCart] = useState<Record<string, any>>({});
+  const [cart, setCart] = useState<Record<string, CartItem>>({});
 
   // Campaign data
   // const raisedAmount = 840000;
