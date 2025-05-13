@@ -28,9 +28,8 @@ export default function CampaignSection() {
   const [selectedAmount, setSelectedAmount] = useState('₹1,000');
   const [donationType, setDonationType] = useState('one-time');
   const [selectedCategory, setSelectedCategory] = useState('All Perks');
-  const [expanded, setExpanded] = useState(null);
-  const [cart, setCart] = useState({});
-
+  const [expanded, setExpanded] = useState<string | null>(null);
+    const [cart, setCart] = useState<Record<string, number>>({});
   // Campaign data
   const raisedAmount = 840000;
   const goalAmount = 2500000;
@@ -80,12 +79,12 @@ export default function CampaignSection() {
     setCurrent((prev) => (prev - 1 + images.length) % images.length);
   };
   // Format currency
-  const formatCurrency = (amount) => {
+  const formatCurrency = (amount: number) => {
     return `₹${amount.toLocaleString()}`;
   };
 
   // Update cart
-  const updateCart = (id, change) => {
+  const updateCart = (id: string, change: number) => {
     const currentAmount = cart[id] || 0;
     const newAmount = Math.max(0, currentAmount + change);
     
@@ -96,16 +95,18 @@ export default function CampaignSection() {
   };
 
   // Calculate subtotal
-  const subtotal = Object.entries(cart).reduce((total, [id, quantity]) => {
-    const perk = perks.find(p => p.id === id);
-    if (!perk) return total;
-    return total + (parseInt(perk.price.replace(/,/g, '')) * quantity);
-  }, 0);
+// Assuming cart is Record<string, number> and perks is an array of objects with id and price
 
-  // Handle accordion change
-  const handleAccordionChange = (panel) => {
-    setExpanded(expanded === panel ? null : panel);
-  };
+const subtotal = Object.entries(cart).reduce((total: number, [id, quantity]: [string, number]) => {
+  const perk = perks.find((p: { id: string; price: string }) => p.id === id);
+  if (!perk) return total;
+  return total + (parseInt(perk.price.replace(/,/g, '')) * quantity);
+}, 0);
+
+// Handle accordion change
+const handleAccordionChange = (panel: string | null) => {
+  setExpanded(expanded === panel ? null : panel);
+};
 
   // Perk data
   const perks = [
@@ -306,7 +307,7 @@ export default function CampaignSection() {
                   <motion.div
                     key={index}
                     whileHover={{ y: -2 }}
-                    className={`flex items-center px-3 py-1.5 rounded-full text-sm ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-700'}`}
+                    className={`flex items-center px-3 py-1.5 rounded-full text-sm  bg-gray-100 text-gray-700`}
                   >
                     <span className="mr-2">{item.icon}</span>
                     {item.text}
@@ -402,7 +403,7 @@ export default function CampaignSection() {
                       <motion.div
                         key={index}
                         whileHover={{ scale: 1.05 }}
-                        className={`p-4 rounded-xl text-center ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm hover:shadow-md transition-shadow`}
+                        className={`p-4 rounded-xl text-center bg-white shadow-sm hover:shadow-md transition-shadow`}
                       >
                         <p className="text-2xl font-bold text-orange-500">{stat.value}</p>
                         <p className="text-sm text-gray-600 dark:text-gray-400">{stat.label}</p>
@@ -412,7 +413,7 @@ export default function CampaignSection() {
                 </div>
 
                {/* Perks Section */}
-<div id="perks" className={`min-h-screen rounded-lg ${darkMode ? 'bg-gray-900 text-white' : 'text-gray-800'}`}>
+<div id="perks" className={`min-h-screen rounded-l text-gray-800}`}>
   <div className="container mx-auto px-4 py-8">
     
     {/* Header */}
@@ -422,94 +423,94 @@ export default function CampaignSection() {
       </h1>
     </div>
 
-    {/* Category Select */}
-    <div className="mb-8">
-      <div className={`relative w-full border rounded-lg ${darkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-300 bg-white'} shadow-sm`}>
-        <select 
-          className={`appearance-none w-full px-4 py-3 rounded-lg focus:outline-none ${darkMode ? 'bg-gray-800' : 'bg-white'}`}
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          aria-label="Select perk category"
-        >
-          <option value="All Perks">All Perks</option>
-          <option value="Digital">Digital Rewards</option>
-          <option value="Sponsorship">Sponsorships</option>
-        </select>
-        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4">
-          <ChevronDown size={20} className={darkMode ? 'text-gray-400' : 'text-gray-500'} />
+ {/* Category Select */}
+<div className="mb-8">
+  <div className="relative w-full border border-gray-300 bg-white rounded-lg shadow-sm">
+    <select 
+      className="appearance-none w-full px-4 py-3 rounded-lg focus:outline-none bg-white"
+      value={selectedCategory}
+      onChange={(e) => setSelectedCategory(e.target.value)}
+      aria-label="Select perk category"
+    >
+      <option value="All Perks">All Perks</option>
+      <option value="Digital">Digital Rewards</option>
+      <option value="Sponsorship">Sponsorships</option>
+    </select>
+    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4">
+      <ChevronDown size={20} className="text-gray-500" />
+    </div>
+  </div>
+</div>
+
+{/* Perks Grid */}
+<div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+  {filteredPerks.map((perk) => (
+    <motion.div 
+      key={perk.id} 
+      whileHover={{ y: -5 }}
+      className="p-5 rounded-xl flex items-center bg-white shadow-sm hover:shadow-md transition-all duration-300 border border-gray-200"
+    >
+      <div className="flex-shrink-0 mr-5">
+        <img 
+          src={perk.image} 
+          alt={perk.name} 
+          className="w-24 h-24 object-cover rounded-lg"
+          loading="lazy"
+        />
+      </div>
+      <div className="flex-1">
+        <div className="flex justify-between items-start mb-1">
+          <div>
+            <h3 className="font-bold text-lg text-gray-900">{perk.name}</h3>
+            <p className="text-orange-500 font-semibold">₹{perk.price}</p>
+          </div>
+          <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">
+            {perk.stock} remaining
+          </span>
+        </div>
+        <p className="text-sm text-gray-600 mb-2">{perk.description}</p>
+        <div className="flex justify-between items-center mt-2">
+          <div className="flex items-center space-x-2">
+            <IconButton
+              onClick={() => updateCart(perk.id, -1)} 
+              className="p-1 rounded-full text-gray-500 hover:text-gray-800 border border-gray-300"
+              aria-label="Decrease quantity"
+              size="small"
+            >
+              <Minus size={16} />
+            </IconButton>
+            <span className="mx-1 w-8 text-center">{cart[perk.id] || 0}</span>
+            <IconButton
+              onClick={() => updateCart(perk.id, 1)} 
+              className="p-1 rounded-full text-gray-500 hover:text-gray-800 border border-gray-300"
+              aria-label="Increase quantity"
+              size="small"
+            >
+              <Plus size={16} />
+            </IconButton>
+          </div>
+          {cart[perk.id] ? (
+            <span className="text-sm text-green-600">Added to cart</span>
+          ) : (
+            <button 
+              onClick={() => updateCart(perk.id, 1)}
+              className="text-sm text-orange-500 hover:underline"
+            >
+              Add to cart
+            </button>
+          )}
         </div>
       </div>
-    </div>
-
-    {/* Perks Grid */}
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-      {filteredPerks.map((perk) => (
-        <motion.div 
-          key={perk.id} 
-          whileHover={{ y: -5 }}
-          className={`p-5 rounded-xl flex items-center ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm hover:shadow-md transition-all duration-300 border ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}
-        >
-          <div className="flex-shrink-0 mr-5">
-            <img 
-              src={perk.image} 
-              alt={perk.name} 
-              className="w-24 h-24 object-cover rounded-lg"
-              loading="lazy"
-            />
-          </div>
-          <div className="flex-1">
-            <div className="flex justify-between items-start mb-1">
-              <div>
-                <h3 className="font-bold text-lg text-gray-900 dark:text-white">{perk.name}</h3>
-                <p className="text-orange-500 font-semibold">₹{perk.price}</p>
-              </div>
-              <span className={`text-xs px-2 py-1 rounded-full ${darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'}`}>
-                {perk.stock} remaining
-              </span>
-            </div>
-            <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'} mb-2`}>{perk.description}</p>
-            <div className="flex justify-between items-center mt-2">
-              <div className="flex items-center space-x-2">
-                <IconButton
-                  onClick={() => updateCart(perk.id, -1)} 
-                  className={`p-1 rounded-full ${darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-800'} border ${darkMode ? 'border-gray-700' : 'border-gray-300'}`}
-                  aria-label="Decrease quantity"
-                  size="small"
-                >
-                  <Minus size={16} />
-                </IconButton>
-                <span className="mx-1 w-8 text-center">{cart[perk.id] || 0}</span>
-                <IconButton
-                  onClick={() => updateCart(perk.id, 1)} 
-                  className={`p-1 rounded-full ${darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-800'} border ${darkMode ? 'border-gray-700' : 'border-gray-300'}`}
-                  aria-label="Increase quantity"
-                  size="small"
-                >
-                  <Plus size={16} />
-                </IconButton>
-              </div>
-              {cart[perk.id] ? (
-                <span className="text-sm text-green-600 dark:text-green-400">Added to cart</span>
-              ) : (
-                <button 
-                  onClick={() => updateCart(perk.id, 1)}
-                  className="text-sm text-orange-500 dark:text-orange-400 hover:underline"
-                >
-                  Add to cart
-                </button>
-              )}
-            </div>
-          </div>
-        </motion.div>
-      ))}
-    </div>
+    </motion.div>
+  ))}
+</div>
 
     {/* Cart Summary */}
     {Object.keys(cart).length > 0 && (
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className={`p-6 rounded-xl ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-lg border ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}
+        className={`p-6 rounded-xl  bg-white shadow-lg border border-gray-200`}
       >
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Your Contribution</h3>
         
@@ -573,9 +574,8 @@ export default function CampaignSection() {
       <motion.article
         key={update.id}
         whileHover={{ y: -2 }}
-        className={`p-6 rounded-2xl transition-shadow border shadow-sm hover:shadow-md ${
-          darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-        }`}
+        className={`p-6 rounded-2xl transition-shadow border shadow-sm hover:shadow-md bg-white border-gray-200
+        `}
       >
         <div className="flex gap-4">
           <div className="h-10 w-10 flex-shrink-0 rounded-full bg-gradient-to-r from-orange-400 to-orange-600 flex items-center justify-center text-white font-bold">
@@ -617,46 +617,41 @@ export default function CampaignSection() {
   </h2>
 
   <div className="space-y-4">
-    {faqs.map((faq, index) => {
-      const isOpen = expanded === `panel${index}`;
-      return (
-        <motion.div
-          key={index}
-          whileHover={{ y: -2 }}
-          className={`rounded-2xl transition-colors duration-300 border ${
-            darkMode
-              ? 'bg-gray-800 border-gray-700'
-              : 'bg-white border-gray-200'
-          } shadow-sm`}
-        >
-          <button
-            onClick={() => handleAccordionChange(`panel${index}`)}
-            className="w-full flex items-center justify-between px-6 py-5 text-left group"
-          >
-            <span className="text-base font-medium text-gray-900 dark:text-white">
-              {faq.question}
-            </span>
-            <ChevronDown
-              size={20}
-              className={`transform transition-transform duration-200 ${
-                isOpen ? 'rotate-180' : ''
-              } ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}
-            />
-          </button>
+  {faqs.map((faq, index) => {
+  const isOpen = expanded === `panel${index}`;
+  return (
+    <motion.div
+      key={index}
+      whileHover={{ y: -2 }}
+      className="rounded-2xl transition-colors duration-300 border bg-white border-gray-200 shadow-sm"
+    >
+      <button
+        onClick={() => handleAccordionChange(`panel${index}`)}
+        className="w-full flex items-center justify-between px-6 py-5 text-left group"
+      >
+        <span className="text-base font-medium text-gray-900">
+          {faq.question}
+        </span>
+        <ChevronDown
+          size={20}
+          className={`transform transition-transform duration-200 ${isOpen ? 'rotate-180' : ''} text-gray-500`}
+        />
+      </button>
 
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={isOpen ? { height: "auto", opacity: 1 } : { height: 0, opacity: 0 }}
-            transition={{ duration: 0.25, ease: "easeInOut" }}
-            className={`px-6 ${isOpen ? 'pb-5' : ''} overflow-hidden`}
-          >
-            <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-              {faq.answer}
-            </p>
-          </motion.div>
-        </motion.div>
-      );
-    })}
+      <motion.div
+        initial={{ height: 0, opacity: 0 }}
+        animate={isOpen ? { height: "auto", opacity: 1 } : { height: 0, opacity: 0 }}
+        transition={{ duration: 0.25, ease: "easeInOut" }}
+        className={`px-6 ${isOpen ? 'pb-5' : ''} overflow-hidden`}
+      >
+        <p className="text-sm text-gray-600 leading-relaxed">
+          {faq.answer}
+        </p>
+      </motion.div>
+    </motion.div>
+  );
+})}
+
   </div>
 </div>
 
