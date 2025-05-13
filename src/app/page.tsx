@@ -109,12 +109,12 @@ export default function CampaignSection() {
 
 
   // Calculate subtotal
-  const subtotal = Object.entries(cart).reduce((total, [id, quantity]) => {
+  const subtotal = Object.entries(cart).reduce((total, [id, cartItem]) => {
     const perk = perks.find(p => p.id === id);
     if (!perk) return total;
-    return total + (parseInt(perk.price.replace(/,/g, '')) * quantity);
+    return total + (parseInt(perk.price.replace(/,/g, '')) * cartItem.quantity);
   }, 0);
-
+  
   // Handle accordion change
   const handleAccordionChange = (panel: string): void => {
     setExpanded(expanded === panel ? null : panel);
