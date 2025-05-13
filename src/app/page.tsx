@@ -1,1075 +1,906 @@
-'use client';
-import React, { useState, useEffect, ChangeEvent } from 'react';
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
-import { Share, Users, Heart, MinusCircle,PlusCircle, ChevronDown, ChevronUp, ArrowUp, Mail, MapPin, Phone,  } from 'lucide-react';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
+'use client'
+import React, { useState } from 'react';
+import { motion,AnimatePresence } from 'framer-motion';
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { 
+  Button, 
+  IconButton, 
+  useTheme 
+} from '@mui/material';
+import { 
+  Heart, 
+  Share, 
+  Users, 
+  ChevronDown, 
+  Plus, 
+  Minus 
+} from 'lucide-react';
+import { MapPin, Phone, Mail } from 'lucide-react';
 
-import { MenuItem,  Box, Paper, ListItemText, ListItemIcon } from '@mui/material';
 
-import { ExpandMore, Check } from '@mui/icons-material';
+// Animation variants
+const fadeIn = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
+};
 
-
-
-export default function JoyfulMindsPage() {
-
-  interface Cart {
-    [key: string]: number; // or number if id is numeric
-  }
-
-  interface Perk {
-    id: number;
-    name: string;
-    description: string;
-    image: string;
-    price: number;
-    stock: number;
-  }
-  
-
-  const [showScrollTop, setShowScrollTop] = useState(false);
+export default function CampaignSection() {
   const [darkMode, setDarkMode] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [cart, setCart] = useState<Cart>({});
-  const [subtotal, setSubtotal] = useState(0);
-  const [open, setOpen] = useState(false);
-  const [hoveredItem, setHoveredItem] =  useState<string | null>(null);
-  const { scrollY } = useScroll();
-  const [currency, setCurrency] = useState('INR');
+  const [selectedAmount, setSelectedAmount] = useState('₹1,000');
+  const [donationType, setDonationType] = useState('one-time');
+  const [selectedCategory, setSelectedCategory] = useState('All Perks');
+  const [expanded, setExpanded] = useState(null);
+  const [cart, setCart] = useState({});
 
+  // Campaign data
+  const raisedAmount = 840000;
+  const goalAmount = 2500000;
+  const percentComplete = (raisedAmount / goalAmount) * 100;
+  const supporters = 242;
+  const daysRemaining = 18;
 
-
-  const currencies = ['USD', 'INR', 'EUR', 'GBP'];
-
-  const handleChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
-    setCurrency(event.target.value);
+  // Theme
+  const theme = useTheme();
+  const palettes = {
+    primary: {
+      main: '#F97316', // Orange primary color from image
+      light: '#FDBA74',
+      dark: '#C2410C',
+      contrastText: '#FFFFFF'
+    },
+    secondary: {
+      main: '#F59E0B', // Yellow secondary color from image
+      light: '#FCD34D',
+      dark: '#B45309',
+      contrastText: '#FFFFFF'
+    }
   };
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setShowScrollTop(window.scrollY > 300);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  // Custom input for MUI Select to allow styling with Tailwind
-// const CustomSelect = styled(Select)(({ theme }) => ({
-//   '& .MuiSelect-select': {
-//     display: 'flex',
-//     alignItems: 'center',
-//     padding: '8px 12px',
-//     fontWeight: 500,
-//   },
-//   '& .MuiOutlinedInput-notchedOutline': {
-//     border: 0,
-//   },
-//   '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-//     border: 0,
-//   },
-// }));
-
-// const donors = [
-//   { name: "Good Soul", time: "a month ago", amount: "INR 1" },
-//   { name: "Good Soul", time: "6 months ago", amount: "INR 1" },
-//   { name: "Aditya Saste", time: "6 months ago", amount: "INR 1" },
-//   { name: "SHARAN INGALESHWAR", time: "9 months ago", amount: "INR 1 / Month", subscribed: true },
-//   { name: "SHARAN INGALESHWAR", time: "10 months ago", amount: "INR 1" },
-//   { name: "Aditya Saste", time: "10 months ago", amount: "INR 1" },
-//   { name: "kiran kumar", time: "a year ago", amount: "INR 55000", on: "Chet Jain" },
-// ];
-
-
-  // Categories for the dropdown
-  const categories = [
-    'All',
-    'Books',
-    'Accessories',
-    'Donations',
-    'Other'
+  const images = [
+    {
+      src: "https://cdn.pixabay.com/photo/2015/06/22/08/37/children-817365_1280.jpg",
+      location: "📍 Mumbai, India",
+    },
+    {
+      src: "https://cdn.pixabay.com/photo/2013/10/02/23/03/mountains-190055_1280.jpg",
+      location: "📍 Delhi, India",
+    },
+    {
+      src: "https://cdn.pixabay.com/photo/2023/03/28/11/52/ai-generated-7882967_1280.jpg",
+      location: "📍 Bangalore, India",
+    },
   ];
 
-  // Available perks
+  const [current, setCurrent] = useState(0);
+
+  const nextSlide = () => {
+    setCurrent((prev) => (prev + 1) % images.length);
+  };
+
+  const prevSlide = () => {
+    setCurrent((prev) => (prev - 1 + images.length) % images.length);
+  };
+  // Format currency
+  const formatCurrency = (amount) => {
+    return `₹${amount.toLocaleString()}`;
+  };
+
+  // Update cart
+  const updateCart = (id, change) => {
+    const currentAmount = cart[id] || 0;
+    const newAmount = Math.max(0, currentAmount + change);
+    
+    setCart(prev => ({
+      ...prev,
+      [id]: newAmount || 0
+    }));
+  };
+
+  // Calculate subtotal
+  const subtotal = Object.entries(cart).reduce((total, [id, quantity]) => {
+    const perk = perks.find(p => p.id === id);
+    if (!perk) return total;
+    return total + (parseInt(perk.price.replace(/,/g, '')) * quantity);
+  }, 0);
+
+  // Handle accordion change
+  const handleAccordionChange = (panel) => {
+    setExpanded(expanded === panel ? null : panel);
+  };
+
+  // Perk data
   const perks = [
     {
-      id: 1,
-      name: 'Book- The 7 Habits of Highly Effective People',
-      description: 'The 7 Habits of Highly Effective People, first edition',
-      price: 1000,
-      image: 'https://crowdera-platform.s3.ap-south-1.amazonaws.com/gocrowdera/campaign-assets/dbf91ad2-53da-46b2-b104-9de8a428d7e7_thumbnail_OIP (18).jpeg',
-      category: 'Books',
-      stock: 9
+      id: 'perk1',
+      name: 'Animal Sponsorship',
+      price: '2,000',
+      stock: 48,
+      description: `Sponsor an animal at our shelter for one month. You'll receive regular updates and photos.`,
+      image: 'https://cdn.pixabay.com/photo/2020/06/24/03/31/child-5334516_1280.jpg',
+      category: 'Sponsorship'
     },
     {
-      id: 2,
-      name: 'Backpack- Student Urban Design',
-      description: 'The Basil Urban Dry Backpack is a comfortable and stylish choice',
-      price: 3000,
-      image: 'https://crowdera-platform.s3.ap-south-1.amazonaws.com/gocrowdera/campaign-assets/72857a90-6bbe-40c7-a20d-a4b4f4214f1d_thumbnail_OIP (19).jpeg',
-      category: 'Accessories',
-      stock: 9
+      id: 'perk2',
+      name: 'Digital Thank You Card',
+      price: '500',
+      stock: 97,
+      description: 'A beautiful digital thank you card featuring artwork created by our rescued animals.',
+      image: 'https://cdn.pixabay.com/photo/2018/07/14/11/33/earth-3537401_1280.jpg',
+      category: 'Digital'
     },
     {
-      id: 3,
-      name: 'JaipurFoot Gratitude Box',
-      description: 'Expressing Gratitude for Generous Supporters',
-      price: 5000,
-      image: 'https://crowdera-platform.s3.ap-south-1.amazonaws.com/assets/reward-1.png',
-      category: 'Donations',
-      stock: 1000
+      id: 'perk3',
+      name: 'Shelter Visit Experience',
+      price: '5,000',
+      stock: 15,
+      description: 'Exclusive shelter visit for you and one guest, including a guided tour and animal interaction session.',
+      image: 'https://cdn.pixabay.com/photo/2021/04/24/18/07/road-6204694_1280.jpg',
+      category: 'Experience'
     }
   ];
 
   // Filter perks based on selected category
-  const filteredPerks: Perk[]  = selectedCategory === 'All' 
+  const filteredPerks = selectedCategory === 'All Perks' 
     ? perks 
     : perks.filter(perk => perk.category === selectedCategory);
 
-  // Update cart and subtotal
-  const updateCart = (id: number, change: number) => {
-    // const perk = perks.find(p => p.id === id);
-    const currentQuantity = cart[id] || 0;
-    const newQuantity = Math.max(0, currentQuantity + change);
-    
-    const newCart = { ...cart };
-    if (newQuantity === 0) {
-      delete newCart[id];
-    } else {
-      newCart[id] = newQuantity;
-    }
-    
-    setCart(newCart);
-  };
-
-  // Calculate subtotal whenever cart changes
-  useEffect(() => {
-    let total = 0;
-    Object.entries(cart).forEach(([id, quantity]) => {
-      const perk = perks.find(p => p.id === parseInt(id));
-      if (perk) {
-        total += perk.price * quantity;
-      }
-    });
-    setSubtotal(total);
-  }, [cart]);
-
-  // Format price in Indian Rupees
-  const formatPrice = (price: number): string => {
-    return `₹${price.toLocaleString('en-IN')}`;
-  };
-
-  // // Toggle dark mode
-  // const toggleDarkMode = () => {
-  //   setDarkMode(!darkMode);
-  // };
-
-
+  // Updates data
   const updates = [
     {
       id: 1,
-      title: "New campaign update",
-      time: "a minute ago",
-      author: "Swapnil Kumbhar",
-      role: "(Organizer)",
-      content: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.",
+      title: 'New Medical Equipment Arrived!',
+      author: 'Priya Sharma',
+      role: 'Veterinarian',
+      time: '2 days ago',
+      content: 'We are thrilled to announce that our new medical equipment has arrived at the shelter. This will significantly improve our ability to provide care for injured animals. Thank you to all our supporters who made this possible!'
+    },
+    {
+      id: 2,
+      title: 'Summer Adoption Drive Success',
+      author: 'Rahul Patel',
+      role: 'Program Director',
+      time: '1 week ago',
+      content: 'Our summer adoption drive was a huge success! We found forever homes for 26 animals last weekend. The community response was overwhelming and we couldn\'t be more grateful.'
     }
   ];
 
-  const palettes = {
-    primary: {
-      light: "#4C9F38",
-      main: "#4C9F38",
-      dark: "#4C9F38",
-      contrastText: "#fff"
+  // FAQ data
+  const faqs = [
+    {
+      question: 'How is my donation used?',
+      answer: 'Your donation directly supports our animal rescue operations, including medical care, food, shelter maintenance, and staff training. We ensure that at least 85% of all donations go directly to animal care.'
     },
-    secondary: {
-      light: "#eecd5e",
-      main: "#E9BD29",
-      dark: "#d5a916",
-      contrastText: "#000"
+    {
+      question: `Can I visit the animals I've helped?`,
+      answer: 'Absolutely! We welcome visits from our supporters. You can schedule a visit to our shelter by contacting our office, and you might even get to meet some of the animals your donation has helped.'
+    },
+    {
+      question: 'Is my donation tax-deductible?',
+      answer: 'Yes, Summer Sparks is a registered non-profit organization, and all donations are tax-deductible as allowed by law. You will receive a receipt for your donation that you can use for tax purposes.'
     }
-  };
-
-  // Animation values
-  const headerOpacity = useTransform(scrollY, [0, 100], [1, 0.9]);
-  const headerScale = useTransform(scrollY, [0, 100], [1, 0.98]);
+  ];
 
   return (
-    <div className={`font-sans ${darkMode ? 'dark bg-gray-900' : 'bg-gray-50'} min-h-screen transition-colors duration-300`}>
-      {/* Navigation */}
-      <motion.nav 
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.3 }}
-        className="bg-white dark:bg-gray-800 shadow-sm sticky top-0  z-50 border-b border-gray-100 dark:border-gray-700"
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
-          <div className="flex items-center">
-            <img 
-              src="https://cdn.pixabay.com/photo/2022/08/21/03/48/smile-7400381_1280.jpg" 
-              alt="Joyful Minds Logo" 
-              className="mr-2 h-10 w-10 rounded-full object-cover"
-            />
-            <span className="font-bold text-indigo-600 dark:text-indigo-400 text-xl">Joyful Minds</span>
-          </div>
-          <div className="hidden md:flex space-x-6">
-  {['HOME', 'ABOUT US', 'OUR INITIATIVES', 'LOG IN', 'PERKS', 'CONTACT US'].map((item) => {
-    const href =
-      item === 'PERKS' ? '#perks' :
-      item === 'HOME' ? '/' :
-      item === 'ABOUT US' ? '#about' :
-      item === 'OUR INITIATIVES' ? '#initiatives' :
-      item === 'LOG IN' ? '#login' :
-      item === 'CONTACT US' ? '#contact' :
-      '#';
-
-    return (
-      <a 
-        key={item}
-        href={href}
-        className="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200 font-medium text-sm"
-      >
-        {item}
-      </a>
-    );
-  })}
-</div>
-
-
-
-          {/* Currency */}
-          <Box className="relative w-32">
-      {/* Custom styled select component */}
-      <Box
-        className={`rounded-xl border-2 bg-white/80 backdrop-blur-sm dark:bg-gray-800/80
-          ${open ? 'border-blue-400 dark:border-blue-500' : 'border-gray-200 dark:border-gray-600'}
-          transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer`}
-        onClick={() => setOpen(!open)}
-      >
-        <Box className="flex items-center justify-between px-3 py-2">
-          <span className="text-sm font-medium text-gray-800 dark:text-gray-100 ">
-            {currency}
-          </span>
-          <motion.div animate={{ rotate: open ? 180 : 0 }}>
-            <ExpandMore className="text-gray-500 dark:text-gray-400 " />
-          </motion.div>
-        </Box>
-      </Box>
-
-      {/* Floating label */}
-      <motion.span 
-        className={`absolute -top-2 left-2 px-1 text-xs font-medium rounded
-          ${open ? 'text-blue-500 dark:text-blue-400 bg-white dark:bg-gray-800' : 
-            'text-gray-500 dark:text-gray-400 bg-white/80 dark:bg-gray-800/80'}`}
-        transition={{ duration: 0.2 }}
-      >
-        Currency
-      </motion.span>
-
-      {/* Custom dropdown menu */}
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-            className="absolute z-10 w-full mt-1"
-          >
-            <Paper className="shadow-xl rounded-lg overflow-hidden dark:bg-gray-800">
-              {currencies.map((option: string) => (
-                <MenuItem
-                  key={option}
-                  value={option}
-                  selected={currency === option}
-                  onClick={() => {
-                    handleChange({ target: { value: option } }as React.ChangeEvent<HTMLInputElement>);
-                    setOpen(false);
-                  }}
-                  onMouseEnter={() => setHoveredItem(option)}
-                  onMouseLeave={() => setHoveredItem(null)}
-                  className={`px-3 py-2 transition-all duration-100 ${
-                    currency === option
-                      ? 'bg-blue-50/50 dark:bg-blue-900/30 '
-                      : 'hover:bg-gray-100/50 dark:hover:bg-gray-700'
-                  }`}
-                >
-                  <ListItemText
-                    primary={option}
-                    primaryTypographyProps={{
-                      className: `text-sm ${
-                        currency === option
-                          ? 'text-blue-600 dark:text-blue-300 font-medium'
-                          : 'text-gray-700 dark:text-gray-800 '
-                      }`
-                    }}
-                  />
-                  {currency === option && (
-                    <ListItemIcon className="min-w-0 ml-2">
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                      >
-                        <Check className="text-blue-500 dark:text-blue-400 text-lg" />
-                      </motion.div>
-                    </ListItemIcon>
-                  )}
-                  {hoveredItem === option && currency !== option && (
-                    <motion.div
-                      className="absolute left-0 top-0 h-full w-1 bg-blue-400 rounded-r"
-                      initial={{ scaleY: 0 }}
-                      animate={{ scaleY: 1 }}
-                      exit={{ scaleY: 0 }}
-                      transition={{ duration: 0.2 }}
-                    />
-                  )}
-                </MenuItem>
-              ))}
-            </Paper>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </Box>
-
-
-          
-          <div className="flex items-center space-x-4">
-            <button 
-              onClick={() => setDarkMode(!darkMode)}
-              className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:cursor-pointer"
-            >
-              {darkMode ? '☀️' : '🌙'}
-            </button>
-            <button
-  style={{
-    background: palettes.secondary.main,
-    color: palettes.secondary.contrastText,
-  }}
-  onMouseEnter={e => {
-    e.currentTarget.style.background = ` ${palettes.secondary.dark}`;
-  }}
-  onMouseLeave={e => {
-    e.currentTarget.style.background = `${palettes.secondary.main}`;
-  }}
-  className="hidden md:block font-semibold py-2 px-4 rounded-lg shadow-sm transition-all duration-200 hover:shadow-md"
->
-  DONATE NOW
-</button>
-
-            <button className="md:hidden text-gray-500 dark:text-gray-400">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </motion.nav>
-
-      {/* Campaign Banner */}
-      <motion.div
-        style={{ opacity: headerOpacity, scale: headerScale }}
-        className="relative bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900 dark:to-blue-900 py-3"
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div 
-            initial={{ scale: 0.95, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="flex items-center justify-center text-sm text-indigo-800 dark:text-indigo-200 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm py-2 px-4 rounded-full inline-flex mx-auto border border-indigo-100 dark:border-indigo-800 shadow-sm"
-          >
-            <span
-  style={{
-    backgroundColor: palettes.secondary.dark,
-    color: palettes.secondary.contrastText,
-  }}
-  className="px-3 py-1 rounded-full text-xs font-semibold mr-2 shadow-sm"
->
-  THIS CAMPAIGN SUPPORTS A FUNDRAISING INITIATIVE BY DIGITAL MINDS
-</span>
-
-          </motion.div>
-        </div>
-      </motion.div>
-
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Content - Campaign Details */}
-          <div className="lg:col-span-2 space-y-8">
-            <motion.div
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-900 font-sans text-gray-900 dark:text-white">
+      {/* Hero Banner */}
+      <div className="relative bg-gradient-to-b from-amber-500/80 to-orange-600/90 overflow-hidden">
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-20"
+          style={{ backgroundImage: "url('/api/placeholder/1600/500')" }}
+        ></div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 relative z-10">
+          <div className="max-w-3xl">
+            <motion.h1 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-4xl md:text-5xl font-bold text-white mb-6"
+            >
+              Help <span className="text-yellow-300">Summer Sparks</span> Protect Animals in Need
+            </motion.h1>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-xl text-white/90 mb-8"
+            >
+              Join our mission to rescue, rehabilitate, and rehome abandoned and injured animals across India.
+            </motion.p>
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="flex flex-wrap gap-4"
+            >
+              <Button
+                variant="contained"
+                size="large"
+                startIcon={<Heart size={20} />}
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  color: palettes.primary.main,
+                  padding: '12px 24px',
+                  borderRadius: '8px',
+                  fontWeight: 600,
+                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                }}
+              >
+                Donate Now
+              </Button>
+              <Button
+                variant="outlined"
+                size="large"
+                style={{
+                  borderColor: '#FFFFFF',
+                  color: '#FFFFFF',
+                  padding: '12px 24px',
+                  borderRadius: '8px',
+                  fontWeight: 600
+                }}
+              >
+                Learn More
+              </Button>
+            </motion.div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Content - Campaign Details */}
+          <div className="lg:col-span-2 space-y-10">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
               transition={{ duration: 0.5 }}
+              variants={fadeIn}
               className="space-y-8"
             >
-              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white leading-tight">
-                Joyful Minds Mumbai Volunteers Group
-              </h1>
+              {/* Main Image with Floating Label */}
+              <div className="relative max-w-4xl mx-auto overflow-hidden rounded-2xl shadow-xl">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={images[current].src}
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.98 }}
+          transition={{ duration: 0.6 }}
+          className="relative"
+        >
+          <img
+            src={images[current].src}
+            alt="Animal shelter"
+            className="w-full object-cover h-80 md:h-[500px]"
+            loading="lazy"
+          />
+          <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm font-medium shadow-sm">
+            {images[current].location}
+          </div>
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Navigation Buttons */}
+      <button
+        onClick={prevSlide}
+        className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-md transition"
+      >
+        <ChevronLeft className="w-5 h-5 text-gray-700" />
+      </button>
+      <button
+        onClick={nextSlide}
+        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-md transition"
+      >
+        <ChevronRight className="w-5 h-5 text-gray-700" />
+      </button>
+    </div>
+
               
-              {/* Main Image */}
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.98 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-                viewport={{ once: true }}
-                className="rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
-              >
-                <img 
-                  src="https://cdn.pixabay.com/photo/2020/10/05/20/03/boys-5630669_1280.jpg" 
-                  alt="Children in blue uniforms with volunteer" 
-                  className="w-full object-cover h-96 md:h-[500px]"
-                />
-              </motion.div>
-              
-              {/* Campaign Info */}
-              <div className="flex flex-wrap items-center text-gray-500 dark:text-gray-400 text-sm gap-4">
-                <div className="flex items-center bg-gray-50 dark:bg-gray-800 px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-700">
-                  <span className="bg-blue-100 dark:bg-blue-900 p-1 rounded-full mr-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-500 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  </span>
-                  Created 2 years ago
-                </div>
-                <div className="flex items-center bg-gray-50 dark:bg-gray-800 px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-700">
-                  <span className="bg-purple-100 dark:bg-purple-900 p-1 rounded-full mr-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-purple-500 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-                  </span>
-                  Children, Women & Elderly
-                </div>
+              {/* Campaign Info Chips */}
+              <div className="flex flex-wrap items-center gap-3">
+                {[
+                  { icon: '⏳', text: 'Created 2 years ago' },
+                  { icon: '🐾', text: 'Animals, Safety & Welfare' },
+                  { icon: '🏷️', text: 'Verified Non-Profit' }
+                ].map((item, index) => (
+                  <motion.div
+                    key={index}
+                    whileHover={{ y: -2 }}
+                    className={`flex items-center px-3 py-1.5 rounded-full text-sm ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-700'}`}
+                  >
+                    <span className="mr-2">{item.icon}</span>
+                    {item.text}
+                  </motion.div>
+                ))}
               </div>
               
               {/* Campaign Description */}
-              <div className="space-y-8">
+              <div className="space-y-6">
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Our Mission</h2>
+                
                 <p className="text-gray-700 dark:text-gray-300 text-lg leading-relaxed">
-                  Help bring joy to the lives of children, women & the elderly! Join our fundraiser campaign in Mumbai, India. 
-                  Our goal is to raise ₹100000. #JoyfulMindsMumbai
+                  At <span className="font-semibold text-orange-600">Summer Sparks</span>, we're dedicated to protecting animals in need across India. 
+                  Our comprehensive program provides shelter, medical care, and rehabilitation for abandoned and injured animals, 
+                  while also working to educate communities about animal welfare.
                 </p>
                 
-                <motion.div 
+                {/* Highlight Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <motion.div 
+                    whileHover={{ y: -5 }}
+                    className="bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-900/30 dark:to-blue-900/30 p-5 rounded-xl border-l-4 border-indigo-500 dark:border-indigo-400 shadow-sm hover:shadow-md transition-all duration-300"
+                  >
+                    <div className="flex">
+                      <span className="text-indigo-500 mr-3 text-2xl">🏥</span>
+                      <div>
+                        <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Medical Care</h3>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">
+                          Providing essential veterinary services to injured and sick animals.
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+                  
+                  <motion.div 
+                    whileHover={{ y: -5 }}
+                    className="bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-900/30 dark:to-amber-900/30 p-5 rounded-xl border-l-4 border-yellow-500 dark:border-yellow-400 shadow-sm hover:shadow-md transition-all duration-300"
+                  >
+                    <div className="flex">
+                      <span className="text-yellow-500 mr-3 text-2xl">🍽️</span>
+                      <div>
+                        <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Nutrition Program</h3>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">
+                          Ensuring every animal receives proper nutrition daily.
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+                  
+                  <motion.div 
+                    whileHover={{ y: -5 }}
+                    className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 p-5 rounded-xl border-l-4 border-green-500 dark:border-green-400 shadow-sm hover:shadow-md transition-all duration-300"
+                  >
+                    <div className="flex">
+                      <span className="text-green-500 mr-3 text-2xl">🏠</span>
+                      <div>
+                        <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Shelter & Rehoming</h3>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">
+                          Finding loving forever homes for rehabilitated animals.
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+                </div>
+
+                {/* Video Embed */}
+                {/* <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2, duration: 0.5 }}
                   viewport={{ once: true }}
-                  className="bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/50 dark:to-blue-900/50 p-6 rounded-xl border-l-4 border-indigo-500 dark:border-indigo-400 shadow-sm hover:shadow-md transition-shadow duration-300"
+                  className="relative pt-[56.25%] rounded-xl overflow-hidden shadow-lg bg-gray-200 dark:bg-gray-700"
                 >
-                  <div className="flex">
-                    <span className="text-yellow-500 mr-3 text-2xl">✨</span>
-                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                      At Joyful Minds, we are driven by an unwavering commitment to enhancing the health and well-being of 
-                      children everywhere. We firmly believe that each and every child deserves not just a life, but a vibrant, healthy, 
-                      and fulfilling life. We understand that healthy children are not only happier, but are also better poised to learn, 
-                      grow, and make meaningful contributions to society.
-                    </p>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <button className="bg-white/90 backdrop-blur-sm p-4 rounded-full shadow-lg hover:scale-110 transition-transform">
+                      <svg className="w-8 h-8 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                      </svg>
+                    </button>
                   </div>
-                </motion.div>
-                
-                <motion.div 
-                  initial={{ opacity: 0, y: 10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3, duration: 0.5 }}
-                  viewport={{ once: true }}
-                  className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/50 dark:to-indigo-900/50 p-6 rounded-xl border-l-4 border-blue-500 dark:border-blue-400 shadow-sm hover:shadow-md transition-shadow duration-300"
-                >
-                  <div className="flex">
-                    <span className="text-blue-500 mr-3 text-2xl">🌐</span>
-                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                      Shockingly, in a world brimming with opportunities, there are still 1 billion children who face the harsh 
-                      reality of lacking basic necessities like housing, clean water, sanitation facilities, and regular meals due to the 
-                      scourge of poverty. These children deserve more than just our sympathy - they deserve our actions.
-                    </p>
+                </motion.div> */}
+
+                {/* Impact Section */}
+                <div className="space-y-4">
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Our Impact</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {[
+                      { value: '1,200+', label: 'Animals Helped' },
+                      { value: '15', label: 'Shelters Built' },
+                      { value: '85%', label: 'Adoption Rate' },
+                      { value: '24/7', label: 'Emergency Care' }
+                    ].map((stat, index) => (
+                      <motion.div
+                        key={index}
+                        whileHover={{ scale: 1.05 }}
+                        className={`p-4 rounded-xl text-center ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm hover:shadow-md transition-shadow`}
+                      >
+                        <p className="text-2xl font-bold text-orange-500">{stat.value}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{stat.label}</p>
+                      </motion.div>
+                    ))}
                   </div>
-                </motion.div>
+                </div>
 
-
-                {/* Perk */}
-                <div id="perks" className={`min-h-screen rounded-lg ${darkMode ? 'bg-gray-900 text-white' : 'text-gray-800'}`}>
+               {/* Perks Section */}
+<div id="perks" className={`min-h-screen rounded-lg ${darkMode ? 'bg-gray-900 text-white' : 'text-gray-800'}`}>
   <div className="container mx-auto px-4 py-8">
-    <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
+    
+    {/* Header */}
+    <div className="flex justify-between items-center mb-6">
       <h1 className="text-2xl font-bold flex items-center">
-        Choose a perk <span className="ml-2 text-yellow-400">✨</span>
+        Choose a Perk <span className="ml-2 text-yellow-400">✨</span>
       </h1>
+    </div>
 
-      <div className={`relative w-full md:w-60 border rounded-lg ${darkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-300 bg-white'}`}>
+    {/* Category Select */}
+    <div className="mb-8">
+      <div className={`relative w-full border rounded-lg ${darkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-300 bg-white'} shadow-sm`}>
         <select 
-          className={`appearance-none w-full px-4 py-2 rounded-lg focus:outline-none ${darkMode ? 'bg-gray-800' : 'bg-white'}`}
+          className={`appearance-none w-full px-4 py-3 rounded-lg focus:outline-none ${darkMode ? 'bg-gray-800' : 'bg-white'}`}
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
           aria-label="Select perk category"
         >
-          {categories.map((category) => (
-            <option key={category} value={category}>{category}</option>
-          ))}
+          <option value="All Perks">All Perks</option>
+          <option value="Digital">Digital Rewards</option>
+          <option value="Sponsorship">Sponsorships</option>
         </select>
-        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3">
+        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4">
           <ChevronDown size={20} className={darkMode ? 'text-gray-400' : 'text-gray-500'} />
         </div>
       </div>
     </div>
 
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    {/* Perks Grid */}
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
       {filteredPerks.map((perk) => (
-        <div 
+        <motion.div 
           key={perk.id} 
-          className={`p-5 rounded-lg flex flex-col sm:flex-row sm:items-center ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm`}
+          whileHover={{ y: -5 }}
+          className={`p-5 rounded-xl flex items-center ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm hover:shadow-md transition-all duration-300 border ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}
         >
-          <div className="flex-shrink-0 sm:mr-6 mb-4 sm:mb-0 flex flex-col items-center">
+          <div className="flex-shrink-0 mr-5">
             <img 
               src={perk.image} 
               alt={perk.name} 
-              className="w-20 h-20 object-cover rounded mb-2"
-              width={64}
-              height={64}
+              className="w-24 h-24 object-cover rounded-lg"
+              loading="lazy"
             />
-            <div className="font-bold text-sm text-center">{formatPrice(perk.price)}</div>
+          </div>
+          <div className="flex-1">
+            <div className="flex justify-between items-start mb-1">
+              <div>
+                <h3 className="font-bold text-lg text-gray-900 dark:text-white">{perk.name}</h3>
+                <p className="text-orange-500 font-semibold">₹{perk.price}</p>
+              </div>
+              <span className={`text-xs px-2 py-1 rounded-full ${darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'}`}>
+                {perk.stock} remaining
+              </span>
+            </div>
+            <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'} mb-2`}>{perk.description}</p>
+            <div className="flex justify-between items-center mt-2">
+              <div className="flex items-center space-x-2">
+                <IconButton
+                  onClick={() => updateCart(perk.id, -1)} 
+                  className={`p-1 rounded-full ${darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-800'} border ${darkMode ? 'border-gray-700' : 'border-gray-300'}`}
+                  aria-label="Decrease quantity"
+                  size="small"
+                >
+                  <Minus size={16} />
+                </IconButton>
+                <span className="mx-1 w-8 text-center">{cart[perk.id] || 0}</span>
+                <IconButton
+                  onClick={() => updateCart(perk.id, 1)} 
+                  className={`p-1 rounded-full ${darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-800'} border ${darkMode ? 'border-gray-700' : 'border-gray-300'}`}
+                  aria-label="Increase quantity"
+                  size="small"
+                >
+                  <Plus size={16} />
+                </IconButton>
+              </div>
+              {cart[perk.id] ? (
+                <span className="text-sm text-green-600 dark:text-green-400">Added to cart</span>
+              ) : (
+                <button 
+                  onClick={() => updateCart(perk.id, 1)}
+                  className="text-sm text-orange-500 dark:text-orange-400 hover:underline"
+                >
+                  Add to cart
+                </button>
+              )}
+            </div>
+          </div>
+        </motion.div>
+      ))}
+    </div>
+
+    {/* Cart Summary */}
+    {Object.keys(cart).length > 0 && (
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className={`p-6 rounded-xl ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-lg border ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}
+      >
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Your Contribution</h3>
+        
+        <div className="space-y-3 mb-4">
+          {filteredPerks
+            .filter(perk => cart[perk.id])
+            .map(perk => (
+              <div key={perk.id} className="flex justify-between items-center">
+                <div>
+                  <span className="font-medium text-gray-900 dark:text-white">{perk.name}</span>
+                  <span className="text-gray-500 dark:text-gray-400 text-sm ml-2">x{cart[perk.id]}</span>
+                </div>
+                <span className="font-medium">₹{parseInt(perk.price.replace(/,/g, '')) * cart[perk.id]}</span>
+              </div>
+            ))}
+        </div>
+        
+        <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+          <div className="flex justify-between items-center font-semibold text-lg">
+            <span>Total</span>
+            <span>₹{subtotal}</span>
+          </div>
+        </div>
+        
+        <motion.div 
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          className="mt-6"
+        >
+          <Button
+            variant="contained"
+            fullWidth
+            startIcon={<Heart size={20} />}
+            style={{
+              background: `linear-gradient(135deg, ${palettes.secondary.main}, ${palettes.primary.main})`,
+              color: palettes.secondary.contrastText,
+              padding: '12px',
+              borderRadius: '12px',
+              fontSize: '1rem',
+              fontWeight: 600,
+              boxShadow: '0 4px 6px rgba(245, 158, 11, 0.3)'
+            }}
+          >
+            Proceed to Donate
+          </Button>
+        </motion.div>
+      </motion.div>
+    )}
+  </div>
+</div>
+{/* Updates Section */}
+<section className="space-y-8">
+  <header className="flex items-center justify-between">
+    <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+      Updates <span className="text-base font-medium text-gray-500 dark:text-gray-400">({updates.length})</span>
+    </h2>
+  </header>
+
+  <div className="grid gap-6">
+    {updates.map((update) => (
+      <motion.article
+        key={update.id}
+        whileHover={{ y: -2 }}
+        className={`p-6 rounded-2xl transition-shadow border shadow-sm hover:shadow-md ${
+          darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+        }`}
+      >
+        <div className="flex gap-4">
+          <div className="h-10 w-10 flex-shrink-0 rounded-full bg-gradient-to-r from-orange-400 to-orange-600 flex items-center justify-center text-white font-bold">
+            {update.author.charAt(0)}
           </div>
 
-          <div className="flex flex-col w-full">
-            <h3 className="font-bold mb-1">{perk.name}</h3>
-            <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'} mb-2`}>
-              {perk.description}
+          <div className="flex-1 space-y-2">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{update.title}</h3>
+              <span className="text-sm text-gray-500 dark:text-gray-400">{update.time}</span>
+            </div>
+
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Posted by <span className="text-orange-500 dark:text-orange-400">{update.author}</span> ({update.role})
             </p>
 
-            <div className="flex justify-between items-center mt-auto">
-              <p className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                Only {perk.stock} remaining.
-              </p>
-              <div className="flex items-center">
-                <button 
-                  onClick={() => updateCart(perk.id, -1)} 
-                  className={`p-1 rounded-full ${darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-800'}`}
-                  aria-label="Decrease quantity"
-                >
-                  <MinusCircle size={16} />
-                </button>
-                <span className="mx-2 text-xs text-gray-500">{cart[perk.id] || 0}</span>
-                <button 
-                  onClick={() => updateCart(perk.id, 1)} 
-                  className={`p-1 rounded-full ${darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-800'}`}
-                  aria-label="Increase quantity"
-                >
-                  <PlusCircle size={16} />
-                </button>
-              </div>
+            <p className="text-gray-700 dark:text-gray-300 text-[15px] leading-relaxed">
+              {update.content}
+            </p>
+
+            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+              <button className="text-orange-500 dark:text-orange-400 hover:underline text-sm font-medium">
+                Read full update
+              </button>
             </div>
           </div>
         </div>
-      ))}
-
-      {/* Subtotal and Donate Button */}
-      <div className={`p-5 rounded-lg flex flex-col items-center justify-between ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm`}>
-        <div className='text-center mb-4'>
-          <p className="text-sm font-medium leading-relaxed">
-            Subtotal ({Object.keys(cart).length} items):
-          </p>
-          <p className="text-2xl font-bold leading-relaxed">
-            {formatPrice(subtotal)}
-          </p>
-        </div>
-
-        <button
-          className={`w-full sm:w-80 px-6 py-3 rounded-lg flex justify-center items-center text-center transition duration-200 ${
-            Object.keys(cart).length > 0
-              ? ''
-              : `${darkMode ? 'bg-gray-700 text-gray-500' : 'bg-gray-200 text-gray-400'} cursor-not-allowed`
-          }`}
-          style={
-            Object.keys(cart).length > 0
-              ? {
-                  backgroundColor: palettes.secondary.main,
-                  color: palettes.secondary.contrastText,
-                }
-              : {}
-          }
-          onMouseEnter={(e) => {
-            if (Object.keys(cart).length > 0) {
-              e.currentTarget.style.backgroundColor = palettes.secondary.dark;
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (Object.keys(cart).length > 0) {
-              e.currentTarget.style.backgroundColor = palettes.secondary.main;
-            }
-          }}
-          disabled={Object.keys(cart).length === 0}
-          aria-label="Donate now"
-        >
-          <Heart size={20} className="mr-2" />
-          DONATE NOW
-        </button>
-      </div>
-    </div>
+      </motion.article>
+    ))}
   </div>
-</div>
+</section>
 
 
-         {/* Updates */}
-                <div className="container mx-auto px-4 py-8 max-w-5xl">
-  <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm p-6 ">
-    <h2 className="text-2xl font-bold text-gray-800 dark:text-white leading-relaxed">
-      Updates ({updates.length})
-    </h2>
 
-    <div className="border-t border-gray-200 dark:border-gray-700">
-      {updates.map((update) => (
-        <div key={update.id} className="relative pl-8 pt-8">
-          {/* Timeline elements */}
-          <div className="absolute left-0 top-8 h-full w-px bg-green-500"></div>
-          <div className="absolute left-0 top-8 w-2 h-2 rounded-full bg-green-500 -translate-x-1/2"></div>
+                {/* FAQ Section */}
+                <div className="max-w-3xl mx-auto space-y-8 px-4 sm:px-6 lg:px-0">
+  <h2 className="text-3xl font-semibold tracking-tight text-gray-900 dark:text-white">
+    Frequently Asked Questions
+  </h2>
+
+  <div className="space-y-4">
+    {faqs.map((faq, index) => {
+      const isOpen = expanded === `panel${index}`;
+      return (
+        <motion.div
+          key={index}
+          whileHover={{ y: -2 }}
+          className={`rounded-2xl transition-colors duration-300 border ${
+            darkMode
+              ? 'bg-gray-800 border-gray-700'
+              : 'bg-white border-gray-200'
+          } shadow-sm`}
+        >
+          <button
+            onClick={() => handleAccordionChange(`panel${index}`)}
+            className="w-full flex items-center justify-between px-6 py-5 text-left group"
+          >
+            <span className="text-base font-medium text-gray-900 dark:text-white">
+              {faq.question}
+            </span>
+            <ChevronDown
+              size={20}
+              className={`transform transition-transform duration-200 ${
+                isOpen ? 'rotate-180' : ''
+              } ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}
+            />
+          </button>
 
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="mb-8"
+            initial={{ height: 0, opacity: 0 }}
+            animate={isOpen ? { height: "auto", opacity: 1 } : { height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: "easeInOut" }}
+            className={`px-6 ${isOpen ? 'pb-5' : ''} overflow-hidden`}
           >
-            <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-1">
-              {update.title}
-            </h3>
-            <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm mb-4">
-              <AccessTimeIcon className="h-4 w-4 mr-1" />
-              <span className="mr-2">{update.time}</span>
-              <span className="mr-2">by</span>
-              <span className="text-indigo-600 dark:text-indigo-400 font-medium mr-1">
-                {update.author}
-              </span>
-              <span>{update.role}</span>
-            </div>
-
-            <div className="text-gray-700 dark:text-gray-300 mb-6 leading-relaxed">
-              <p>{update.content}</p>
-            </div>
-
-            <div className="w-full h-32 bg-gradient-to-b from-gray-200 to-gray-300 dark:from-gray-800 dark:to-gray-700 rounded-lg mb-4 flex items-center justify-center">
-              <a
-                href="#"
-                className="text-white font-semibold hover:underline"
-              >
-                Read More
-              </a>
-            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+              {faq.answer}
+            </p>
           </motion.div>
-        </div>
-      ))}
-    </div>
+        </motion.div>
+      );
+    })}
   </div>
 </div>
 
-
-
-
-
-                {/* Our Initiatives */}
-                <motion.div 
-                  initial={{ opacity: 0, y: 10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4, duration: 0.5 }}
-                  viewport={{ once: true }}
-                  className="space-y-6"
-                >
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
-                    <span className="text-pink-500 mr-3 text-2xl">💕</span> Our Initiatives:
-                  </h2>
-                  
-                  <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow duration-300">
-                    <h3 className="font-semibold text-gray-900 dark:text-white text-lg mb-3">Vaccination Drives:</h3>
-                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                      Every child deserves a shot at a healthy life. We conduct regular vaccination drives, 
-                      providing life-saving protection against life threatening diseases to over 44,000 underprivileged children.
-                    </p>
-                  </div>
-                </motion.div>
               </div>
-
-              {/* Comments Section */}
-              <motion.div 
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5, duration: 0.5 }}
-                viewport={{ once: true }}
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-100 dark:border-gray-700"
-              >
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Comments</h3>
-                  <div className="flex items-center space-x-2">
-                    <p className="text-gray-500 dark:text-gray-400 text-sm">0 comments</p>
-                    <div className="h-4 border-l border-gray-200 dark:border-gray-700"></div>
-                    <div className="flex items-center text-sm">
-                      <span className="text-gray-500 dark:text-gray-400">Sort by:</span>
-                      <button className="flex items-center ml-2 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-                        Oldest <ChevronDown className="h-4 w-4 ml-1" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="flex items-start mb-4">
-                  <div className="h-10 w-10 rounded-full bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 mr-4"></div>
-                  <textarea 
-                    className="flex-1 border border-gray-200 dark:border-gray-700 rounded-lg p-3 resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300"
-                    placeholder="Add a comment..."
-                    rows={3}
-                  ></textarea>
-                </div>
-                
-                <div className="text-gray-400 dark:text-gray-500 text-sm">Facebook Comments Plugin</div>
-              </motion.div>
-
-              {/* FAQ Section */}
-              <motion.div 
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6, duration: 0.5 }}
-                viewport={{ once: true }}
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-100 dark:border-gray-700"
-              >
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">FAQ&apos;s</h3>
-                
-                <Accordion type="single" collapsible className="space-y-4">
-                  <AccordionItem value="item-1" className="border-b border-gray-100 dark:border-gray-700 pb-4">
-                    <AccordionTrigger className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 text-left font-medium flex justify-between items-center w-full">
-                      Can I support more than one mission on the Crowdera platform?
-                      <ChevronDown className="h-5 w-5 text-gray-400 dark:text-gray-500 transition-transform duration-200" />
-                    </AccordionTrigger>
-                    <AccordionContent className="text-gray-600 dark:text-gray-400 pt-2">
-                      Yes, you can support multiple missions on the Crowdera platform. There&apos;s no limit to the number of causes you can donate to.
-                    </AccordionContent>
-                  </AccordionItem>
-                  
-                  <AccordionItem value="item-2" className="border-b border-gray-100 dark:border-gray-700 pb-4">
-                    <AccordionTrigger className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 text-left font-medium flex justify-between items-center w-full">
-                      Can I establish contact with the beneficiary I support?
-                      <ChevronDown className="h-5 w-5 text-gray-400 dark:text-gray-500 transition-transform duration-200" />
-                    </AccordionTrigger>
-                    <AccordionContent className="text-gray-600 dark:text-gray-400 pt-2">
-                      Yes, you can establish contact with the beneficiaries. The platform facilitates connection between donors and beneficiaries.
-                    </AccordionContent>
-                  </AccordionItem>
-                  
-                  <AccordionItem value="item-3" className="border-b-0 pb-0">
-                    <AccordionTrigger className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 text-left font-medium flex justify-between items-center w-full">
-                      Why should I donate through Crowdera instead of donating directly?
-                      <ChevronDown className="h-5 w-5 text-gray-400 dark:text-gray-500 transition-transform duration-200" />
-                    </AccordionTrigger>
-                    <AccordionContent className="text-gray-600 dark:text-gray-400 pt-2">
-                      Crowdera provides transparency, security, and ease of donation. It also helps organizations reach a wider audience and track their fundraising progress.
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              </motion.div>
             </motion.div>
           </div>
           
-          {/* Right Sidebar - Donation Card & Info */}
-          <div className="lg:col-span-1 space-y-6">
-            {/* Donation Card */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 sticky absolute inset-x-0 top-0 z-[9999]"
-            >
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h3 className="text-3xl font-bold text-gray-900 dark:text-white">₹ 2,32,609</h3>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">Raised out of ₹ 100000</p>
-                </div>
-                <div className="flex items-center bg-gradient-to-r from-orange-100 to-orange-50 dark:from-orange-900/50 dark:to-orange-800/50 text-orange-800 dark:text-orange-200 px-3 py-1 rounded-full text-xs font-semibold border border-orange-200 dark:border-orange-700">
-                  <span>TAX BENEFITS</span>
-                </div>
-              </div>
-              
-              {/* Progress Bar */}
-              <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full mb-6 overflow-hidden">
-                <motion.div 
-                  initial={{ width: 0 }}
-                  animate={{ width: '100%' }}
-                  transition={{ duration: 1, delay: 0.3 }}
-                  className="h-full bg-gradient-to-r from-green-400 to-green-500 dark:from-green-500 dark:to-green-600 rounded-full"
-                />
-              </div>
-              
-              {/* Stats */}
-              <div className="grid grid-cols-3 gap-4 mb-6">
-                <div className="text-center">
-                  <h4 className="text-2xl font-bold text-gray-900 dark:text-white">4</h4>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">Contributions</p>
-                </div>
-                <div className="text-center">
-                  <h4 className="text-2xl font-bold text-gray-900 dark:text-white">3</h4>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">Shares</p>
-                </div>
-                <div className="text-center">
-                  <h4 className="text-2xl font-bold text-gray-900 dark:text-white">232%</h4>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">Funded</p>
-                </div>
-              </div>
-              
-              {/* Buttons */}
-              <button
-  style={{
-    background: palettes.secondary.main,
-    color: palettes.secondary.contrastText,
-    border: `1px solid ${palettes.secondary.light}`,
-  }}
-  onMouseEnter={(e) => {
-    e.currentTarget.style.background = palettes.secondary.dark;
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.background = palettes.secondary.main;
-  }}
-  className="w-full hover:from-[${palettes.secondary.main}] hover:to-[${palettes.secondary.dark}] 
-    font-semibold py-3 px-4 rounded-lg shadow-md transition-all duration-200 hover:shadow-lg mb-4 flex justify-center items-center"
->
-  <Heart className="h-5 w-5 mr-2" /> DONATE NOW
-</button>
+          {/* Right Sidebar */}
+<div className="space-y-6">
+  {/* Donation Card */}
+  <motion.div
+    initial={{ opacity: 0, y: 30 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5 }}
+    viewport={{ once: true }}
+    className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-200 dark:border-gray-700 "
+  >
+    <div className="space-y-6">
+      {/* Progress */}
+      <div>
+        <div className="flex justify-between items-center mb-1">
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Raised</span>
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{percentComplete.toFixed(0)}%</span>
+        </div>
+        <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+          <div 
+            className="h-full rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600"
+            style={{ width: `${percentComplete}%` }}
+          ></div>
+        </div>
+        <div className="flex justify-between mt-2">
+          <span className="text-xs text-gray-500 dark:text-gray-400">{formatCurrency(raisedAmount)}</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400">{formatCurrency(goalAmount)}</span>
+        </div>
+      </div>
 
-
-              
-              <div className="grid grid-cols-2 gap-4">
-              <button
-  style={{
-    background: `linear-gradient(to right, ${palettes.primary.light}, ${palettes.primary.main})`,
-    color: palettes.primary.contrastText,
-    border: `1px solid ${palettes.primary.light}`,
-  }}
-  className="dark:bg-gradient-to-r dark:from-[${palettes.primary.dark}] dark:to-[${palettes.primary.main}] 
-    hover:from-[${palettes.primary.main}] hover:to-[${palettes.primary.dark}] 
-    dark:hover:from-[${palettes.primary.dark}] dark:hover:to-[${palettes.primary.light}] 
-    font-semibold py-3 px-4 rounded-lg shadow-sm transition-all duration-200 hover:shadow-md flex justify-center items-center"
->
-  <Share className="h-5 w-5 mr-2" /> SHARE
-</button>
-
-
-<button
-  style={{
-    backgroundColor: palettes.secondary.main,
-    color: palettes.secondary.contrastText,
-    border: `1px solid ${palettes.secondary.main}`,
-  }}
-  onMouseEnter={(e) => {
-    e.currentTarget.style.background = palettes.secondary.dark;
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.background = palettes.secondary.main;
-  }}
-  className="font-semibold py-3 px-4 rounded-lg shadow-sm transition-all duration-200 hover:shadow-md flex justify-center items-center"
->
-  <Users className="h-5 w-5 mr-2" /> JOIN TEAM
-</button>
-
-              </div>
-            </motion.div>
-            
-            {/* Recent Donors */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.5 }}
-              className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-100 dark:border-gray-700"
-            >
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Recent Donations</h3>
-                <div className="bg-blue-50 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full text-xs font-medium border border-blue-200 dark:border-blue-700">
-                  3 people have just donated
-                </div>
-              </div>
-              
-              <div className="space-y-4">
-                {[
-                  { name: "Swapnil Kumbhar", time: "a year ago", amount: "₹₹₹ 25000" },
-                  { name: "Anand Ahuja", time: "a year ago", amount: "₹₹₹ 2599" },
-                  { name: "Aakash Sagar", time: "a year ago", amount: "₹₹₹ 5000" }
-                ].map((donor, index) => (
-                  <motion.div 
-                    key={index}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.1 * index }}
-                    className="flex items-center group"
-                  >
-                    <div className="h-10 w-10 rounded-full bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 mr-3 flex-shrink-0 group-hover:from-gray-300 group-hover:to-gray-400 dark:group-hover:from-gray-600 dark:group-hover:to-gray-500 transition"></div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-gray-900 dark:text-white truncate">{donor.name}</h4>
-                      <p className="text-gray-500 dark:text-gray-400 text-sm truncate">{donor.time} — {donor.amount}</p>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-              
-              <div className="mt-4 text-center">
-                <button className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 text-sm font-medium transition-colors duration-200">
-                  SEE ALL
-                </button>
-                
-              </div>
-            </motion.div>
-            
-            {/* Organizer Info */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.5 }}
-              className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-100 dark:border-gray-700"
-            >
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Organizer</h3>
-              
-              <div className="flex items-center">
-                <div className="h-12 w-12 rounded-full bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 mr-3 flex-shrink-0"></div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-medium text-gray-900 dark:text-white truncate">Team Crowdera</h4>
-                  <div className="flex items-center">
-                    <span className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-0.5 rounded text-xs mr-2 font-medium">Verified</span>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm truncate">Raised ₹ 2,32,609 from 4 donations</p>
-                  </div>
-                </div>
-                <a href="#" className="text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200 ml-2">
-                  <Mail className="h-5 w-5" />
-                </a>
-              </div>
-            </motion.div>
-            
-            {/* Beneficiary Info */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.5 }}
-              className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-100 dark:border-gray-700"
-            >
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Beneficiary</h3>
-              
-              <div className="flex items-center">
-                <div className="h-12 w-12 rounded-full bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 mr-3 flex-shrink-0"></div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-medium text-gray-900 dark:text-white truncate">Joyful Minds</h4>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">Type: NON-PROFIT</p>
-                </div>
-              </div>
-            </motion.div>
-            
-            {/* Team Fundraisers */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6, duration: 0.5 }}
-              className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-100 dark:border-gray-700"
-            >
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Team Fundraisers (5)</h3>
-                <div className="flex space-x-1">
-                  <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1 rounded-full transition-colors duration-200">
-                    <ChevronUp className="h-5 w-5" />
-                  </button>
-                  <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1 rounded-full transition-colors duration-200">
-                    <ChevronDown className="h-5 w-5" />
-                  </button>
-                </div>
-              </div>
-              
-              <div className="space-y-4">
-                {[
-                  { name: "Team Crowdera", raised: "₹2,32,609", goal: "₹1,00,000" },
-                  { name: "Chiraniv", raised: "₹0", goal: "₹10,000" },
-                  { name: "Aniket Charlewar", raised: "₹0", goal: "₹10,000" }
-                ].map((team, index) => (
-                  <motion.div 
-                    key={index}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.1 * index }}
-                    className="flex items-center group"
-                  >
-                    <div className="h-10 w-10 rounded-full bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 mr-3 flex-shrink-0 group-hover:from-gray-300 group-hover:to-gray-400 dark:group-hover:from-gray-600 dark:group-hover:to-gray-500 transition"></div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-gray-900 dark:text-white truncate">{team.name}</h4>
-                      <p className="text-gray-500 dark:text-gray-400 text-sm truncate">Raised {team.raised} out of {team.goal} goal.</p>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-              
-              <div className="mt-4 text-center">
-                <button className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 text-sm font-medium transition-colors duration-200">
-                  SEE ALL
-                </button>
-              </div>
-            </motion.div>
+      {/* Stats */}
+      <div className="grid grid-cols-3 gap-4 text-center border-b border-gray-200 dark:border-gray-700 pb-5">
+        {[
+          { value: supporters, label: "Supporters" },
+          { value: daysRemaining, label: "Days Left" },
+          { value: "33%", label: "Funded" }
+        ].map((stat, index) => (
+          <div key={index}>
+            <p className="text-lg font-bold text-gray-900 dark:text-white">{stat.value}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">{stat.label}</p>
           </div>
+        ))}
+      </div>
+
+      {/* Amount Selection */}
+      <div>
+        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Select Amount</h3>
+        <div className="grid grid-cols-3 gap-2">
+          {[500, 1000, 2000, 5000, 10000, 20000].map((amount) => (
+            <motion.button
+              key={amount}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setSelectedAmount(`₹${amount.toLocaleString()}`)}
+              className={`text-sm px-2 py-2 rounded-lg transition-all border ${
+                selectedAmount === `₹${amount.toLocaleString()}`
+                  ? "font-bold text-white shadow"
+                  : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+              }`}
+              style={{
+                backgroundColor:
+                  selectedAmount === `₹${amount.toLocaleString()}` ? palettes.primary.main : undefined,
+                borderColor:
+                  selectedAmount === `₹${amount.toLocaleString()}` ? palettes.primary.main : "transparent",
+              }}
+            >
+              ₹{amount.toLocaleString()}
+            </motion.button>
+          ))}
+        </div>
+      </div>
+
+      {/* Custom Amount Input */}
+      <div>
+        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Custom Amount</h3>
+        <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-900">
+          <span className="text-gray-500 text-sm mr-2">₹</span>
+          <input
+            type="text"
+            placeholder="500"
+            className="w-full bg-transparent focus:outline-none text-sm text-gray-900 dark:text-white"
+          />
+        </div>
+      </div>
+
+      {/* Donation Type Toggle */}
+      <div className="flex rounded-md overflow-hidden border border-gray-300 dark:border-gray-600">
+        {["one-time", "monthly"].map((type, idx) => (
+          <button
+            key={type}
+            onClick={() => setDonationType(type)}
+            className={`flex-1 py-2 text-sm font-medium transition-all duration-200 ${
+              donationType === type
+                ? "text-white"
+                : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
+            } ${idx === 0 ? "rounded-l-md" : "rounded-r-md"}`}
+            style={{
+              backgroundColor: donationType === type ? palettes.primary.main : undefined,
+            }}
+          >
+            {type === "one-time" ? "One-time" : "Monthly"}
+          </button>
+        ))}
+      </div>
+
+      {/* Donate Button */}
+      <motion.button
+        whileTap={{ scale: 0.96 }}
+        whileHover={{ scale: 1.02 }}
+        className="w-full flex items-center justify-center gap-2 py-3 text-white text-sm font-bold rounded-lg shadow-lg transition duration-200"
+        style={{
+          backgroundColor: palettes.secondary.main,
+        }}
+      >
+        <Heart className="h-4 w-4" /> Donate Now
+      </motion.button>
+
+      {/* Share and Follow Buttons */}
+      <div className="grid grid-cols-2 gap-3">
+        <button className="flex items-center justify-center gap-2 py-2 text-sm rounded-md bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300">
+          <Share className="h-4 w-4" />
+          Share
+        </button>
+        <button className="flex items-center justify-center gap-2 py-2 text-sm rounded-md bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300">
+          <Heart className="h-4 w-4" />
+          Follow
+        </button>
+      </div>
+    </div>
+  </motion.div>
+  <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Recent Supporters</h3>
+        
+        <div className="space-y-4">
+          {[
+            { name: "Swapnil Kumbhar", time: "2 days ago", amount: "₹25,000" },
+            { name: "Anand Ahuja", time: "3 days ago", amount: "₹2,599" },
+            { name: "Aakash Sagar", time: "5 days ago", amount: "₹5,000" },
+            { name: "Rahul Mehta", time: "1 week ago", amount: "₹10,000" },
+          ].map((donor, index) => (
+            <div 
+              key={index}
+              className="flex items-center group"
+            >
+              <div className="h-10 w-10 rounded-full bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 mr-3 flex-shrink-0 group-hover:from-gray-300 group-hover:to-gray-400 dark:group-hover:from-gray-600 dark:group-hover:to-gray-500 transition"></div>
+              <div className="flex-1 min-w-0">
+                <h4 className="font-medium text-gray-900 dark:text-white truncate">{donor.name}</h4>
+                <p className="text-gray-500 dark:text-gray-400 text-sm truncate">{donor.time} — {donor.amount}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        <div className="mt-4 text-center">
+          <button className="text-orange-500 dark:text-yellow-400 hover:text-orange-800 dark:hover:text-yellow-300 text-sm font-medium transition-colors duration-200">
+            See all
+          </button>
         </div>
       </div>
       
-      {/* Scroll to top button */}
-      <AnimatePresence>
-        {showScrollTop && (
-          <motion.button
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            onClick={scrollToTop}
-            className="fixed bottom-6 right-6 bg-white dark:bg-gray-800 p-3 rounded-full shadow-lg border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:shadow-xl transition-all duration-200 z-40"
-          >
-            <ArrowUp className="h-5 w-5" />
-          </motion.button>
-        )}
-      </AnimatePresence>
-      
-     {/* Footer */}
-<motion.footer 
+      {/* Organizer Info */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">About this campaign</h3>
+        
+        <div className="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+          <p>
+            Join us in igniting Summer Sparks to empower India and protect animal safety with a fundraising goal of ₹5,00,000 this summer!
+          </p>
+          <p>
+            All donations are tax-deductible and will go directly to supporting our mission to provide shelter, medical care, and rehabilitation for abandoned and injured animals across India.
+          </p>
+        </div>
+        
+        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex items-center">
+            <div className="h-12 w-12 rounded-full bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 mr-3 flex-shrink-0"></div>
+            <div className="flex-1 min-w-0">
+              <h4 className="font-medium text-gray-900 dark:text-white truncate">Abundance Team</h4>
+              <div className="flex items-center">
+                <span className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-0.5 rounded text-xs mr-2 font-medium">Verified</span>
+                <p className="text-gray-500 dark:text-gray-400 text-xs truncate">Campaign Organizer</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+</div>
+        </div>
+      </div>
+
+      <motion.footer
   initial={{ opacity: 0 }}
   whileInView={{ opacity: 1 }}
-  transition={{ duration: 0.5 }}
+  transition={{ duration: 0.6 }}
   viewport={{ once: true }}
-  className="bg-gray-900 text-white pt-16 pb-8"
+  className={`mt-16 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900`}
 >
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
-
-      {/* Logo + Contact Info */}
-      <div>
-        <div className="flex items-center mb-4">
-          <img 
-            src="https://cdn.pixabay.com/photo/2022/08/21/03/48/smile-7400381_1280.jpg" 
-            alt="Joyful Minds Logo" 
-            className="mr-2 h-10 w-10 rounded-full object-cover"
+  <div className="max-w-7xl mx-auto px-6 py-12 space-y-12">
+    {/* Grid Layout */}
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+      
+      {/* Brand + Contact Info */}
+      <div className="space-y-4">
+        <div className="flex items-center space-x-3">
+          <img
+            src="https://cdn.pixabay.com/photo/2022/08/21/03/48/smile-7400381_1280.jpg"
+            alt="Joyful Minds Logo"
+            className="h-10 w-10 rounded-full object-cover"
           />
-          <span className="font-bold text-xl">Joyful Minds</span>
+          <span className="text-xl font-bold text-gray-900 dark:text-white">Joyful Minds</span>
         </div>
-        <div className="flex items-start mb-3">
-          <MapPin className="h-5 w-5 mr-2 text-indigo-300 mt-1 flex-shrink-0" />
-          <p className="text-gray-300">206 Sankalp Nagar, Wathoda Nagpur 440008</p>
+
+        <div className="text-sm text-gray-600 dark:text-gray-300 space-y-2">
+          <div className="flex items-start">
+            <MapPin className="h-5 w-5 mr-2 text-indigo-400 flex-shrink-0 mt-0.5" />
+            206 Sankalp Nagar, Wathoda Nagpur 440008
+          </div>
+          <div className="flex items-center">
+            <Phone className="h-5 w-5 mr-2 text-indigo-400 flex-shrink-0" />
+            9175764210
+          </div>
+          <div className="flex items-center">
+            <Mail className="h-5 w-5 mr-2 text-indigo-400 flex-shrink-0" />
+            joyfulminds@gmail.com
+          </div>
         </div>
-        <div className="flex items-center mb-3">
-          <Phone className="h-5 w-5 mr-2 text-indigo-300 flex-shrink-0" />
-          <p className="text-gray-300">9175764210</p>
-        </div>
-        <div className="flex items-center mb-4">
-          <Mail className="h-5 w-5 mr-2 text-indigo-300 flex-shrink-0" />
-          <p className="text-gray-300">joyfulminds@gmail.com</p>
-        </div>
-        <div className="flex space-x-4 mt-4">
-          {/* Social Icons */}
+
+        {/* Social Icons */}
+        <div className="flex space-x-4 pt-2">
           {[
-            { path: "M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z", color: "text-blue-400 hover:text-blue-300" }, // Facebook
-            { path: "M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.189-1.452.232-2.224.084.626 1.956 2.444 3.377 4.6 3.418-2.068 1.622-4.678 2.348-7.29 2.038 2.179 1.397 4.768 2.21 7.557 2.21 9.054 0 14.002-7.496 14.002-13.986 0-.213-.005-.425-.014-.636z", color: "text-sky-400 hover:text-sky-300" }, // Twitter
+            { path: "M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z", color: "text-blue-500 hover:text-blue-400" },
+            { path: "M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.189-1.452.232-2.224.084.626 1.956 2.444 3.377 4.6 3.418-2.068 1.622-4.678 2.348-7.29 2.038 2.179 1.397 4.768 2.21 7.557 2.21 9.054 0 14.002-7.496 14.002-13.986 0-.213-.005-.425-.014-.636z", color: "text-sky-500 hover:text-sky-400" },
           ].map((item, index) => (
-            <svg 
+            <svg
               key={index}
-              fill="currentColor" 
-              viewBox="0 0 24 24" 
-              className={`h-6 w-6 ${item.color} cursor-pointer`}
+              fill="currentColor"
+              viewBox="0 0 24 24"
+              className={`h-6 w-6 ${item.color} cursor-pointer transition duration-300`}
             >
               <path d={item.path} />
             </svg>
@@ -1077,53 +908,57 @@ export default function JoyfulMindsPage() {
         </div>
       </div>
 
-      {/* Navigation Links */}
+      {/* Quick Links */}
       <div>
-        <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
-        <ul className="space-y-2 text-gray-300">
-          <li><a href="#" className="hover:text-indigo-400">Home</a></li>
-          <li><a href="#" className="hover:text-indigo-400">About Us</a></li>
-          <li><a href="#" className="hover:text-indigo-400">Programs</a></li>
-          <li><a href="#" className="hover:text-indigo-400">Contact</a></li>
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Quick Links</h3>
+        <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+          {["Home", "About Us", "Programs", "Contact"].map((link, i) => (
+            <li key={i}><a href="#" className="hover:text-indigo-500">{link}</a></li>
+          ))}
         </ul>
       </div>
 
       {/* Resources */}
       <div>
-        <h3 className="text-lg font-semibold mb-4">Resources</h3>
-        <ul className="space-y-2 text-gray-300">
-          <li><a href="#" className="hover:text-indigo-400">Blog</a></li>
-          <li><a href="#" className="hover:text-indigo-400">FAQs</a></li>
-          <li><a href="#" className="hover:text-indigo-400">Privacy Policy</a></li>
-          <li><a href="#" className="hover:text-indigo-400">Terms of Use</a></li>
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Resources</h3>
+        <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+          {["Blog", "FAQs", "Privacy Policy", "Terms of Use"].map((link, i) => (
+            <li key={i}><a href="#" className="hover:text-indigo-500">{link}</a></li>
+          ))}
         </ul>
       </div>
 
       {/* Newsletter */}
       <div>
-        <h3 className="text-lg font-semibold mb-4">Newsletter</h3>
-        <p className="text-gray-400 mb-4">Stay updated with our latest news and offers.</p>
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Newsletter</h3>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+          Stay updated with our latest news and offers.
+        </p>
         <form className="flex flex-col sm:flex-row items-center">
-          <input 
-            type="email" 
-            placeholder="Your email" 
-            className="w-full px-4 py-2 mb-2 sm:mb-0 sm:mr-2 rounded-md bg-gray-800 text-white placeholder-gray-500 focus:outline-none"
+          <input
+            type="email"
+            placeholder="Your email"
+            className="w-full px-4 py-2 mb-2 sm:mb-0 sm:mr-2 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none"
           />
-          <button 
-            type="submit" 
-            className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 rounded-md text-white font-medium"
+          <button
+            type="submit"
+            className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-md font-medium transition"
           >
             Subscribe
           </button>
         </form>
       </div>
+
+
     </div>
 
-    <div className="border-t border-gray-700 pt-6 text-center text-sm text-gray-400">
+    {/* Bottom Bar */}
+    <div className="pt-6 border-t border-gray-200 dark:border-gray-700 text-sm text-center text-gray-500 dark:text-gray-400">
       © {new Date().getFullYear()} Joyful Minds. All rights reserved.
     </div>
   </div>
 </motion.footer>
-          </div>
-  )
+
+    </main>
+  );
 }
