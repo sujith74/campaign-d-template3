@@ -6,7 +6,7 @@ import {
   Button, 
   IconButton, 
   useTheme ,
-  Card, CardContent, Typography, Avatar, Divider,
+  Card, CardContent, Typography, Avatar, 
 } from '@mui/material';
 import { 
   Heart, 
@@ -15,8 +15,7 @@ import {
   ChevronDown, 
   Plus, 
   Minus,
-  Clock,
-  Bookmark
+
 } from 'lucide-react';
 import { Group, VolunteerActivism } from '@mui/icons-material';
 import { MapPin, Phone, Mail } from 'lucide-react';
@@ -29,22 +28,22 @@ const fadeIn = {
 };
 
 export default function CampaignSection() {
-  const [darkMode, setDarkMode] = useState(false);
-  const [selectedAmount, setSelectedAmount] = useState('₹1,000');
-  const [donationType, setDonationType] = useState('one-time');
+  // const [darkMode, setDarkMode] = useState(false);
+  // const [selectedAmount, setSelectedAmount] = useState('₹1,000');
+  // const [donationType, setDonationType] = useState('one-time');
   const [selectedCategory, setSelectedCategory] = useState('All Perks');
-  const [expanded, setExpanded] = useState(null);
-  const [cart, setCart] = useState({});
+  const [expanded, setExpanded] = useState<string | null>(null);
+    const [cart, setCart] = useState<Record<string, any>>({});
 
   // Campaign data
-  const raisedAmount = 840000;
-  const goalAmount = 2500000;
-  const percentComplete = (raisedAmount / goalAmount) * 100;
-  const supporters = 242;
-  const daysRemaining = 18;
+  // const raisedAmount = 840000;
+  // const goalAmount = 2500000;
+  // const percentComplete = (raisedAmount / goalAmount) * 100;
+  // const supporters = 242;
+  // const daysRemaining = 18;
 
   // Theme
-  const theme = useTheme();
+  // const theme = useTheme();
   const palettes = {
     primary: {
       main: '#3B82F6', // Tailwind blue-500
@@ -86,20 +85,21 @@ export default function CampaignSection() {
     setCurrent((prev) => (prev - 1 + images.length) % images.length);
   };
   // Format currency
-  const formatCurrency = (amount) => {
+  const formatCurrency = (amount: number) => {
     return `₹${amount.toLocaleString()}`;
   };
 
-  // Update cart
-  const updateCart = (id, change) => {
+  // Update cart  
+  const updateCart = (id: string, change: number): void => {
     const currentAmount = cart[id] || 0;
     const newAmount = Math.max(0, currentAmount + change);
-    
-    setCart(prev => ({
+
+    setCart((prev) => ({
       ...prev,
-      [id]: newAmount || 0
+      [id]: newAmount || 0, // Ensure no negative values
     }));
   };
+
 
   // Calculate subtotal
   const subtotal = Object.entries(cart).reduce((total, [id, quantity]) => {
@@ -109,7 +109,7 @@ export default function CampaignSection() {
   }, 0);
 
   // Handle accordion change
-  const handleAccordionChange = (panel) => {
+  const handleAccordionChange = (panel: string): void => {
     setExpanded(expanded === panel ? null : panel);
   };
 
@@ -312,7 +312,7 @@ export default function CampaignSection() {
                   <motion.div
                     key={index}
                     whileHover={{ y: -2 }}
-                    className={`flex items-center px-3 py-1.5 rounded-full text-sm ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-700'}`}
+                    className={`flex items-center px-3 py-1.5 rounded-full text-sm bg-gray-100 text-gray-700`}
                   >
                     <span className="mr-2">{item.icon}</span>
                     {item.text}
@@ -408,7 +408,7 @@ export default function CampaignSection() {
                       <motion.div
                         key={index}
                         whileHover={{ scale: 1.05 }}
-                        className={`p-4 rounded-xl text-center ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm hover:shadow-md transition-shadow`}
+                        className={`p-4 rounded-xl text-center bg-white shadow-sm hover:shadow-md transition-shadow`}
                       >
 <p className="text-2xl font-bold text-blue-500">{stat.value}</p>
 <p className="text-sm text-gray-600">{stat.label}</p>
@@ -442,7 +442,7 @@ export default function CampaignSection() {
           <option value="Sponsorship">Sponsorships</option>
         </select>
         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4">
-          <ChevronDown size={20} className={darkMode ? 'text-gray-400' : 'text-gray-500'} />
+          <ChevronDown size={20} className='text-gray-500' />
         </div>
       </div>
     </div>
@@ -453,7 +453,7 @@ export default function CampaignSection() {
         <motion.div 
           key={perk.id} 
           whileHover={{ y: -5 }}
-          className={`p-5 rounded-xl flex items-center ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm hover:shadow-md transition-all duration-300 border ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}
+          className={`p-5 rounded-xl flex items-center  bg-white shadow-sm hover:shadow-md transition-all duration-300 border border-gray-200`}
         >
           <div className="flex-shrink-0 mr-5">
             <img 
@@ -469,16 +469,16 @@ export default function CampaignSection() {
                 <h3 className="font-bold text-lg text-gray-900 dark:text-white">{perk.name}</h3>
                 <p className="text-blue-600 font-semibold">₹{perk.price}</p>
                 </div>
-              <span className={`text-xs px-2 py-1 rounded-full ${darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'}`}>
+              <span className={`text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700`}>
                 {perk.stock} remaining
               </span>
             </div>
-            <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'} mb-2`}>{perk.description}</p>
+            <p className={`text-sm text-gray-600 mb-2`}>{perk.description}</p>
             <div className="flex justify-between items-center mt-2">
               <div className="flex items-center space-x-2">
                 <IconButton
                   onClick={() => updateCart(perk.id, -1)} 
-                  className={`p-1 rounded-full ${darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-800'} border ${darkMode ? 'border-gray-700' : 'border-gray-300'}`}
+                  className={`p-1 rounded-full text-gray-500 hover:text-gray-800 border border-gray-300`}
                   aria-label="Decrease quantity"
                   size="small"
                 >
@@ -487,7 +487,7 @@ export default function CampaignSection() {
                 <span className="mx-1 w-8 text-center">{cart[perk.id] || 0}</span>
                 <IconButton
                   onClick={() => updateCart(perk.id, 1)} 
-                  className={`p-1 rounded-full ${darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-800'} border ${darkMode ? 'border-gray-700' : 'border-gray-300'}`}
+                  className={`p-1 rounded-full text-gray-500 hover:text-gray-800 border border-gray-300`}
                   aria-label="Increase quantity"
                   size="small"
                 >
@@ -516,7 +516,7 @@ export default function CampaignSection() {
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className={`p-6 rounded-xl ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-lg border ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}
+        className={`p-6 rounded-xl bg-white shadow-lg border border-gray-200`}
       >
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Your Contribution</h3>
         
@@ -580,9 +580,9 @@ export default function CampaignSection() {
       <motion.article
         key={update.id}
         whileHover={{ y: -2 }}
-        className={`p-6 rounded-2xl transition-shadow border shadow-sm hover:shadow-md ${
-          darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-        }`}
+        className={`p-6 rounded-2xl transition-shadow border shadow-sm hover:shadow-md 
+         bg-white border-gray-200
+        `}
       >
         <div className="flex gap-4">
         <div className="h-10 w-10 flex-shrink-0 rounded-full bg-gradient-to-r from-blue-400 to-blue-600 text-white font-bold flex items-center justify-center">
@@ -633,11 +633,8 @@ export default function CampaignSection() {
         <motion.div
           key={index}
           whileHover={{ y: -2 }}
-          className={`rounded-2xl transition-colors duration-300 border ${
-            darkMode
-              ? 'bg-gray-800 border-gray-700'
-              : 'bg-white border-gray-200'
-          } shadow-sm`}
+          className={`rounded-2xl transition-colors duration-300 border bg-white border-gray-200
+           shadow-sm`}
         >
           <button
             onClick={() => handleAccordionChange(`panel${index}`)}
@@ -650,7 +647,7 @@ export default function CampaignSection() {
               size={20}
               className={`transform transition-transform duration-200 ${
                 isOpen ? 'rotate-180' : ''
-              } ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}
+              } text-gray-500`}
             />
           </button>
 
